@@ -1,0 +1,12 @@
+bot.rb
+bot-config.rb
+settings.rb
+
+*.swp
+
+*.gem
+
+auth_factions.yaml
+factions.yaml
+
+stay-connected
