@@ -27,6 +27,7 @@ describe Cinch::Plugins::TyrantTargets do
 
     it 'informs the user when there are no targets' do
       @conn.respond('getFactionRivals', nil, {'rivals' => []})
+      @conn.respond('getFactionRivals', nil, {'rivals' => []})
       replies = get_replies_text(message)
       expect(replies).to be == ['No targets!']
     end
@@ -34,6 +35,7 @@ describe Cinch::Plugins::TyrantTargets do
     # TODO: A bit silly that these tests return THE ENEMY twice.
 
     it 'shows the targets' do
+      @conn.respond('getFactionRivals', nil, {'rivals' => []})
       @conn.respond('getFactionRivals', nil, {'rivals' => [
         {
           'faction_id' => '2000',
@@ -48,6 +50,7 @@ describe Cinch::Plugins::TyrantTargets do
     end
 
     it 'hides infamy-gaining targets' do
+      @conn.respond('getFactionRivals', nil, {'rivals' => []})
       @conn.respond('getFactionRivals', nil, {'rivals' => [
         {
           'faction_id' => '2000',
@@ -62,6 +65,7 @@ describe Cinch::Plugins::TyrantTargets do
     end
 
     it 'stars less-FP targets' do
+      @conn.respond('getFactionRivals', nil, {'rivals' => []})
       @conn.respond('getFactionRivals', nil, {'rivals' => [
         {
           'faction_id' => '2000',
