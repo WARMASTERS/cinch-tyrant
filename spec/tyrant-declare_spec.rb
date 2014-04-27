@@ -26,13 +26,13 @@ describe Cinch::Plugins::TyrantDeclare do
     end
 
     it 'refuses if there is nobody with this name' do
-      @conn.respond('getFactionRivals', nil, {'rivals' => []})
+      @conn.respond('getFactionRivals', 'name=aa', {'rivals' => []})
       replies = get_replies_text(message)
       expect(replies).to be == ['No, there is nobody with that name']
     end
 
     it 'refuses if the request is ambiguous' do
-      @conn.respond('getFactionRivals', nil, {'rivals' => [
+      @conn.respond('getFactionRivals', 'name=aa', {'rivals' => [
         {
           'faction_id' => '2001',
           'rating' => '1',
@@ -53,7 +53,7 @@ describe Cinch::Plugins::TyrantDeclare do
     end
 
     it 'refuses if the declaration would incur infamy' do
-      @conn.respond('getFactionRivals', nil, {'rivals' => [
+      @conn.respond('getFactionRivals', 'name=aa', {'rivals' => [
         {
           'faction_id' => '2001',
           'rating' => '1',
@@ -68,7 +68,7 @@ describe Cinch::Plugins::TyrantDeclare do
 
     context 'when declaration would earn less FP' do
       before :each do
-        @conn.respond('getFactionRivals', nil, {'rivals' => [
+        @conn.respond('getFactionRivals', 'name=aa', {'rivals' => [
           {
             'faction_id' => '2001',
             'rating' => '1',
@@ -97,7 +97,7 @@ describe Cinch::Plugins::TyrantDeclare do
     end
 
     it 'declares the war if everything is fine' do
-      @conn.respond('getFactionRivals', nil, {'rivals' => [
+      @conn.respond('getFactionRivals', 'name=aa', {'rivals' => [
         {
           'faction_id' => '2001',
           'rating' => '1',

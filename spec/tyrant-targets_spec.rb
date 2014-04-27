@@ -20,13 +20,14 @@ describe Cinch::Plugins::TyrantTargets do
       @conn = FakeConnection.new
       @tyrant = Tyrants.get_fake('testplayer', @conn)
       expect(Tyrants).to receive(:get).with('testplayer').and_return(@tyrant)
-      @conn.respond('getFactionInfo', nil, {'rating' => 1000})
+      @conn.respond('getFactionInfo', '', {'rating' => 1000})
     end
 
     let(:message) { make_message(bot, '!targets', channel: '#test') }
 
     it 'informs the user when there are no targets' do
-      @conn.respond('getFactionRivals', nil, {'rivals' => []})
+      @conn.respond('getFactionRivals', 'rating%5Flow=0', {'rivals' => []})
+      @conn.respond('getFactionRivals', 'rating%5Fhigh=0', {'rivals' => []})
       replies = get_replies_text(message)
       expect(replies).to be == ['No targets!']
     end
@@ -34,7 +35,8 @@ describe Cinch::Plugins::TyrantTargets do
     # TODO: A bit silly that these tests return THE ENEMY twice.
 
     it 'shows the targets' do
-      @conn.respond('getFactionRivals', nil, {'rivals' => [
+      @conn.respond('getFactionRivals', 'rating%5Flow=0', {'rivals' => []})
+      @conn.respond('getFactionRivals', 'rating%5Fhigh=0', {'rivals' => [
         {
           'faction_id' => '2000',
           'rating' => '1050',
@@ -44,11 +46,12 @@ describe Cinch::Plugins::TyrantTargets do
         },
       ]})
       replies = get_replies_text(message)
-      expect(replies).to be == ['6: THE ENEMY (1050), THE ENEMY (1050)']
+      expect(replies).to be == ['6: THE ENEMY (1050)']
     end
 
     it 'hides infamy-gaining targets' do
-      @conn.respond('getFactionRivals', nil, {'rivals' => [
+      @conn.respond('getFactionRivals', 'rating%5Flow=0', {'rivals' => []})
+      @conn.respond('getFactionRivals', 'rating%5Fhigh=0', {'rivals' => [
         {
           'faction_id' => '2000',
           'rating' => '1050',
@@ -62,7 +65,8 @@ describe Cinch::Plugins::TyrantTargets do
     end
 
     it 'stars less-FP targets' do
-      @conn.respond('getFactionRivals', nil, {'rivals' => [
+      @conn.respond('getFactionRivals', 'rating%5Flow=0', {'rivals' => []})
+      @conn.respond('getFactionRivals', 'rating%5Fhigh=0', {'rivals' => [
         {
           'faction_id' => '2000',
           'rating' => '1050',
@@ -72,7 +76,7 @@ describe Cinch::Plugins::TyrantTargets do
         },
       ]})
       replies = get_replies_text(message)
-      expect(replies).to be == ['3: THE ENEMY* (1050), THE ENEMY* (1050)']
+      expect(replies).to be == ['3: THE ENEMY* (1050)']
     end
   end
 end

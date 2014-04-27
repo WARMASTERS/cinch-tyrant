@@ -25,13 +25,13 @@ describe Cinch::Plugins::TyrantWar do
     let(:message) { make_message(bot, '!war', channel: '#test') }
 
     it 'informs the user when there are no wars' do
-      @conn.respond('getActiveFactionWars', nil, {'wars' => {}})
+      @conn.respond('getActiveFactionWars', '', {'wars' => {}})
       replies = get_replies_text(message)
       expect(replies).to be == ['No wars!']
     end
 
     it 'shows wars' do
-      @conn.respond('getActiveFactionWars', nil, {'wars' => {
+      @conn.respond('getActiveFactionWars', '', {'wars' => {
         '1' => {
           'faction_war_id' => '1',
           'name' => 'THE ENEMY',
@@ -62,7 +62,7 @@ describe Cinch::Plugins::TyrantWar do
     # TODO: If ID is invalid?
 
     it 'shows war stats' do
-      @conn.respond('getFactionWarInfo', nil, {
+      @conn.respond('getFactionWarInfo', 'faction_war_id=1', {
         'faction_war_id' => '1',
         'name' => 'THE ENEMY',
         'attacker_faction_id' => '1000',
@@ -72,9 +72,9 @@ describe Cinch::Plugins::TyrantWar do
         'atk_pts' => '0',
         'def_pts' => '0',
       })
-      @conn.respond('getOldFactionWars', nil, {'wars' => {
+      @conn.respond('getOldFactionWars', '', {'wars' => {
       }})
-      @conn.respond('getFactionWarRankings', nil, {'rankings' => {
+      @conn.respond('getFactionWarRankings', 'faction_war_id=1', {'rankings' => {
         '1000' => {},
         '1001' => {},
       }})
