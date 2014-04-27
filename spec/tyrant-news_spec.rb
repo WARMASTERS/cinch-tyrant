@@ -85,7 +85,6 @@ describe Cinch::Plugins::TyrantNews do
         'defender_rating_change' => '-1',
       })
       # The victory member only appears in getOldFactionWars, NOT getFactionWarInfo
-      @conn.respond('getOldFactionWars', nil, {'wars' => [@war.merge({'victory' => true})]})
       @conn.respond('getFactionWarInfo', "faction_war_id=1", @war)
       bot.plugins[0].get_timers[0].fire!
       expect(@chan.messages.shift).to be =~
@@ -100,7 +99,6 @@ describe Cinch::Plugins::TyrantNews do
         'defender_rating_change' => '5',
       })
       # The victory member only appears in getOldFactionWars, NOT getFactionWarInfo
-      @conn.respond('getOldFactionWars', nil, {'wars' => [@war.merge({'victory' => false})]})
       @conn.respond('getFactionWarInfo', "faction_war_id=1", @war)
       bot.plugins[0].get_timers[0].fire!
       expect(@chan.messages.shift).to be =~
