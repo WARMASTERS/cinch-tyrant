@@ -46,7 +46,7 @@ describe Cinch::Plugins::TyrantTargets do
         },
       ]})
       replies = get_replies_text(message)
-      expect(replies).to be == ['6: THE ENEMY (1050), THE ENEMY (1050)']
+      expect(replies).to be == ['6: THE ENEMY (1050)']
     end
 
     it 'hides infamy-gaining targets' do
@@ -76,7 +76,7 @@ describe Cinch::Plugins::TyrantTargets do
         },
       ]})
       replies = get_replies_text(message)
-      expect(replies).to be == ['3: THE ENEMY* (1050), THE ENEMY* (1050)']
+      expect(replies).to be == ['3: THE ENEMY* (1050)']
     end
   end
 end

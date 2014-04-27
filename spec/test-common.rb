@@ -1,5 +1,6 @@
 require 'cinch'
 require 'cinch/test'
+require 'rspec/mocks'
 
 BOT_NICK = 'testbot'
 
@@ -129,28 +130,31 @@ end
 
 class FakeConnection
   def initialize
-    @responses = {}
+    RSpec::Mocks::setup(self)
   end
-
-  REQ_REGEX = /\/api\.php\?user_id=\d+&message=(\w+)/
 
   def respond(message, params, response)
-    @responses[message] = response
-  end
-
-  def request(url, params, configs)
-    if match = REQ_REGEX.match(url)
-      message = match[1]
-    else
-      raise "#{url} is not a valid request"
-    end
-
-    raise "unexpected message #{message}" unless @responses.has_key?(message)
-    DeflatedResponse.new(JSON::dump(@responses[message]))
+    regex = req_regex(message)
+    expected_params =
+      if params && !params.empty?
+        /^#{params}&flashcode=/
+      elsif params
+        # Params present but is blank string
+        /^flashcode=/
+      else
+        anything
+      end
+    expect(self).to receive(:request).with(regex, expected_params, anything).and_return(DeflatedResponse.new(JSON::dump(response)))
   end
 
   def cached_gzip_request(path, data, headers, key, delay)
-    request(path, data, headers)
+    self.request(path, data, headers)
+  end
+
+  private
+
+  def req_regex(message)
+    /\/api\.php\?user_id=\d+&message=#{message}/
   end
 end
 
