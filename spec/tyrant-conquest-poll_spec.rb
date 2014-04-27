@@ -210,7 +210,47 @@ describe Cinch::Plugins::TyrantConquestPoll do
     end
   end
 
-  # TODO: conquest map reset notification
+  describe 'conquest map reset' do
+    before :each  do
+      # map is set in top-level before :each, and plugin ctor has been run.
+
+      # And suddenly, the map has no owners! Fire timer again.
+      @conn.respond('getConquestMap', '', {'conquest_map' => {'map' => [
+        make_tile(1),
+        make_tile(2),
+      ]}})
+      bot.plugins[0].get_timers[0].fire!
+    end
+
+    it 'notifies faction channel when the map resets' do
+      expect(@chans[my_channel].messages).to be == ['[CONQUEST] MAP RESET!!!']
+    end
+
+    it 'notifies news channel when the map resets' do
+      expect(@chans[news_channel].messages).to be == ['[CONQUEST] MAP RESET!!!']
+    end
+
+    context 'when map is still unoccupied after a second timer fire' do
+      before :each do
+        @chans.each_value { |c| c.messages.clear }
+
+        # Map is still blank
+        @conn.respond('getConquestMap', '', {'conquest_map' => {'map' => [
+          make_tile(1),
+          make_tile(2),
+        ]}})
+        bot.plugins[0].get_timers[0].fire!
+      end
+
+      it 'does not notify faction channel a second time' do
+        expect(@chans[my_channel].messages).to be == []
+      end
+
+      it 'does not notify news channel a second time' do
+        expect(@chans[news_channel].messages).to be == []
+      end
+    end
+  end
 
   # TODO: conquest news options
 end
