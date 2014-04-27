@@ -29,8 +29,8 @@ describe Cinch::Plugins::TyrantSay do
     let(:message) { make_message(bot, '!say something', channel: '#test') }
 
     it 'says something' do
-      # TODO: Contents of the message?
-      @conn.respond('postFactionMessage', nil, {
+      # Abstraction leak here: I should not have to escape [, ], or /
+      @conn.respond('postFactionMessage', 'text=\[IRC\/test\] something', {
         # lolwut why does Tyrant send nil?
         'result' => nil,
       })
@@ -39,8 +39,8 @@ describe Cinch::Plugins::TyrantSay do
     end
 
     it 'handles failure to post' do
-      # TODO: Contents of the message?
-      @conn.respond('postFactionMessage', nil, {
+      # Abstraction leak here: I should not have to escape [, ], or /
+      @conn.respond('postFactionMessage', 'text=\[IRC\/test\] something', {
         'result' => false,
       })
       replies = get_replies_text(message)

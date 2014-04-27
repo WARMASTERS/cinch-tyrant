@@ -25,7 +25,7 @@ describe Cinch::Plugins::TyrantConquestPoll do
     @tyrant2 = Tyrants.get_fake('testplayer', @conn2)
     expect(Tyrants).to receive(:get).with('poller').and_return(@tyrant)
     expect(Tyrants).to receive(:get).with('testplayer').and_return(@tyrant2)
-    @conn.respond('getConquestMap', nil, {'conquest_map' => {'map' => [
+    @conn.respond('getConquestMap', '', {'conquest_map' => {'map' => [
       make_tile(1, 1000),
       make_tile(2, 1001),
     ]}})
@@ -72,7 +72,7 @@ describe Cinch::Plugins::TyrantConquestPoll do
 
   context 'when my faction invades a defended tile' do
     before(:each) do
-      @conn.respond('getConquestMap', nil, {'conquest_map' => {'map' => [
+      @conn.respond('getConquestMap', '', {'conquest_map' => {'map' => [
         make_tile(1, 1000),
         make_tile(2, 1001, 1000),
       ]}})
@@ -94,7 +94,7 @@ describe Cinch::Plugins::TyrantConquestPoll do
     context 'winning the invasion' do
       before(:each) do
         @chans.each_value { |c| c.messages.clear }
-        @conn.respond('getConquestMap', nil, {'conquest_map' => {'map' => [
+        @conn.respond('getConquestMap', '', {'conquest_map' => {'map' => [
           make_tile(1, 1000),
           make_tile(2, 1000),
         ]}})
@@ -107,7 +107,7 @@ describe Cinch::Plugins::TyrantConquestPoll do
 
   context 'when my faction defends a tile' do
     before(:each) do
-      @conn.respond('getConquestMap', nil, {'conquest_map' => {'map' => [
+      @conn.respond('getConquestMap', '', {'conquest_map' => {'map' => [
         make_tile(1, 1000, 1001),
         make_tile(2, 1001),
       ]}})
@@ -129,7 +129,7 @@ describe Cinch::Plugins::TyrantConquestPoll do
     context 'losing the defense' do
       before(:each) do
         @chans.each_value { |c| c.messages.clear }
-        @conn.respond('getConquestMap', nil, {'conquest_map' => {'map' => [
+        @conn.respond('getConquestMap', '', {'conquest_map' => {'map' => [
           make_tile(1, 1001),
           make_tile(2, 1001),
         ]}})
@@ -142,7 +142,7 @@ describe Cinch::Plugins::TyrantConquestPoll do
 
   context 'when my faction invades an undefended tile' do
     before(:each) do
-      @conn.respond('getConquestMap', nil, {'conquest_map' => {'map' => [
+      @conn.respond('getConquestMap', '', {'conquest_map' => {'map' => [
         make_tile(1, 1000),
         make_tile(2, 1000),
       ]}})
@@ -154,7 +154,7 @@ describe Cinch::Plugins::TyrantConquestPoll do
 
   context 'when my faction loses an undefended tile' do
     before(:each) do
-      @conn.respond('getConquestMap', nil, {'conquest_map' => {'map' => [
+      @conn.respond('getConquestMap', '', {'conquest_map' => {'map' => [
         make_tile(1, 1001),
         make_tile(2, 1001),
       ]}})
@@ -166,11 +166,11 @@ describe Cinch::Plugins::TyrantConquestPoll do
 
   describe 'invasion notifications' do
     before(:each) do
-      @conn.respond('getConquestMap', nil, {'conquest_map' => {'map' => [
+      @conn.respond('getConquestMap', '', {'conquest_map' => {'map' => [
         make_tile(1, 1000),
         make_tile(2, 1001, 1000),
       ]}})
-      @conn2.respond('getConquestTileInfo', nil, {'system' => {
+      @conn2.respond('getConquestTileInfo', 'system_id=2', {'system' => {
         'slots' => {
           '1' => {'commander_id' => 1000, 'health' => '100', 'defeated' => '0'},
         },
@@ -186,7 +186,7 @@ describe Cinch::Plugins::TyrantConquestPoll do
     end
 
     it 'Notifies on commander change' do
-      @conn2.respond('getConquestTileInfo', nil, {'system' => {
+      @conn2.respond('getConquestTileInfo', 'system_id=2', {'system' => {
         'slots' => {
           '1' => {'commander_id' => 1001, 'health' => '100', 'defeated' => '0'},
         },
@@ -198,7 +198,7 @@ describe Cinch::Plugins::TyrantConquestPoll do
     end
 
     it 'Notifies on commander death' do
-      @conn2.respond('getConquestTileInfo', nil, {'system' => {
+      @conn2.respond('getConquestTileInfo', 'system_id=2', {'system' => {
         'slots' => {
           '1' => {'commander_id' => 1000, 'health' => '0', 'defeated' => '1'},
         },

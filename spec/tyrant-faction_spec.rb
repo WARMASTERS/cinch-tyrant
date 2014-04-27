@@ -48,7 +48,7 @@ describe Cinch::Plugins::TyrantFaction do
         'conquest_rating' => '5',
         'result' => true,
       })
-      @conn.respond('leaveFaction', nil, { 'result' => true })
+      @conn.respond('leaveFaction', '', { 'result' => true })
       expect(get_replies_text(message)).to be == [
         'testfaction: 4 members (50% active), Level 19, 700 FP, 1337/7331 W/L, 5 CR, 2 tiles'
       ]
@@ -59,7 +59,7 @@ describe Cinch::Plugins::TyrantFaction do
         'result' => false,
       })
       # TODO: Hmm, maybe we could remove this leaveFaction
-      @conn.respond('leaveFaction', nil, { 'result' => false })
+      @conn.respond('leaveFaction', '', { 'result' => false })
       expect(get_replies_text(message)).to be == [
         'Failed to get info on "testfaction". This probably means they disbanded.'
       ]

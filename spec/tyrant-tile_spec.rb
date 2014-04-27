@@ -15,7 +15,7 @@ describe Cinch::Plugins::TyrantTile do
     @conn = FakeConnection.new
     @tyrant = Tyrants.get_fake('checker', @conn)
     expect(Tyrants).to receive(:get).with('checker').and_return(@tyrant)
-    @conn.respond('getConquestMap', nil, {'conquest_map' => {'map' => [
+    @conn.respond('getConquestMap', '', {'conquest_map' => {'map' => [
       make_tile(1, 1000, x: 1, y: 2),
       make_tile(2, 1001, x: 3, y: 4),
       make_tile(3, 1002, x: 5, y: 6),
@@ -72,7 +72,7 @@ describe Cinch::Plugins::TyrantTile do
     let(:message) { make_message(bot, '!tile 1', channel: '#test') }
 
     it 'shows tile info on tile with decks' do
-      @conn.respond('getConquestTileInfo', nil, {'system' => {
+      @conn.respond('getConquestTileInfo', 'system_id=1', {'system' => {
         'max_health' => 100,
         'slots' => {
           '1' => {'commander_id' => 1000, 'health' => '100', 'defeated' => '0'},
@@ -86,7 +86,7 @@ describe Cinch::Plugins::TyrantTile do
     end
 
     it 'shows tile info on tile with no decks' do
-      @conn.respond('getConquestTileInfo', nil, {'system' => {
+      @conn.respond('getConquestTileInfo', 'system_id=1', {'system' => {
         'max_health' => 100,
         'slots' => {},
       }})

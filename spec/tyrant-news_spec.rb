@@ -15,7 +15,7 @@ describe Cinch::Plugins::TyrantNews do
     @conn = FakeConnection.new
     @tyrant = Tyrants.get_fake('testplayer', @conn)
     expect(Tyrants).to receive(:get).with('testplayer').and_return(@tyrant)
-    @conn.respond('getActiveFactionWars', nil, {'wars' => {}})
+    @conn.respond('getActiveFactionWars', '', {'wars' => {}})
   end
 
   it 'makes a test bot' do
@@ -37,7 +37,7 @@ describe Cinch::Plugins::TyrantNews do
         'def_pts' => '0',
       },
     }}
-    @conn.respond('getActiveFactionWars', nil, wars)
+    @conn.respond('getActiveFactionWars', '', wars)
     bot.plugins[0].get_timers[0].fire!
 
     expect(@chan.messages.shift).to be =~
@@ -66,7 +66,7 @@ describe Cinch::Plugins::TyrantNews do
       wars = { 'wars' => {
         '1' => @war,
       }}
-      @conn.respond('getActiveFactionWars', nil, wars)
+      @conn.respond('getActiveFactionWars', '', wars)
       bot.plugins[0].get_timers[0].fire!
 
       @chan.messages.clear
@@ -74,7 +74,7 @@ describe Cinch::Plugins::TyrantNews do
       # 6 hours and 1 second pass!
       @time += 6 * HOUR + 1
 
-      @conn.respond('getActiveFactionWars', nil, {'wars' => []})
+      @conn.respond('getActiveFactionWars', '', {'wars' => []})
       @war['completed'] = 1
     end
 

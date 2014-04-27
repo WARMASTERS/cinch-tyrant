@@ -22,7 +22,7 @@ describe Cinch::Plugins::TyrantHistory do
   end
 
   it 'shows old wars' do
-    @conn.respond('getOldFactionWars', nil, {'wars' => [
+    @conn.respond('getOldFactionWars', '', {'wars' => [
       {
         'faction_war_id' => '1',
         'name' => 'THE ENEMY',
@@ -46,7 +46,7 @@ describe Cinch::Plugins::TyrantHistory do
     end
 
     before :each do
-      @conn.respond('getOldFactionWars', nil, {'wars' => [
+      @conn.respond('getOldFactionWars', '', {'wars' => [
         {
           'faction_war_id' => '1',
           'name' => 'THE ENEMY',

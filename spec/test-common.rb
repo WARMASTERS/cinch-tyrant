@@ -142,7 +142,8 @@ class FakeConnection
         # Params present but is blank string
         /^flashcode=/
       else
-        anything
+        # nil?!
+        raise "No params specified for #{message}"
       end
     expect(self).to receive(:request).with(regex, expected_params, anything).and_return(DeflatedResponse.new(JSON::dump(response)))
   end

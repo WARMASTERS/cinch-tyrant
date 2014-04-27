@@ -15,7 +15,7 @@ describe Cinch::Plugins::TyrantFactionChat do
     @conn = FakeConnection.new
     @tyrant = Tyrants.get_fake('testplayer', @conn)
     expect(Tyrants).to receive(:get).with('testplayer').and_return(@tyrant)
-    @conn.respond('getFactionMessages', nil, {'messages' => [
+    @conn.respond('getFactionMessages', '', {'messages' => [
       {'post_id' => '60', 'message' => 'm1', 'user_id' => '1'},
     ]})
     @chan = FakeChannel.new
