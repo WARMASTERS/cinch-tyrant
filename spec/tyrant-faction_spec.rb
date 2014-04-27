@@ -24,6 +24,8 @@ describe Cinch::Plugins::TyrantFaction do
 
       @factions = {}
 
+      allow(File).to receive(:exist?).with('/dev/null/1').and_return(false)
+
       # Pretend the yaml file exists, then load a dummy object from it.
       expect(File).to receive(:exist?).with('lolz').and_return(true)
       expect(YAML).to receive(:load_file).with('lolz').and_return(@factions)
