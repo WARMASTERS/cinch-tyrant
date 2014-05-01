@@ -9,7 +9,7 @@ module Cinch; module Plugins; class TyrantConquestCommands
   include Cinch::Plugin
 
   def self.cqmatch(regex, args)
-    args[:prefix] = lambda { |m| /!c /i }
+    args[:prefix] = lambda { |m| /^!c\s+/i }
     match(regex, args.dup)
     args[:prefix] = lambda { |m| m.bot.nick + ': ' }
     match(regex, args.dup)
