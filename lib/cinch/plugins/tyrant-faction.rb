@@ -127,7 +127,8 @@ module Cinch; module Plugins; class TyrantFaction
 
   def send_faction_info(m, verbose, json)
     m.reply(::Tyrant.format_faction(json))
-    if verbose && m.user.master?
+    expected_id = m.channel && BOT_CHANNELS[m.channel].id
+    if verbose && (m.user.master? || json['faction_id'].to_i == expected_id)
       if verbose.include?('m')
         m.reply('Message: ' + (json['message'] || 'nil'))
       end
