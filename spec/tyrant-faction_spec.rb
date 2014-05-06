@@ -16,6 +16,22 @@ describe Cinch::Plugins::TyrantFaction do
     expect(bot).to be_a Cinch::Bot
   end
 
+  def make_faction(opts = {})
+    {
+      'faction_id' => '9001',
+      'name' => 'testfaction',
+      'num_members' => '4',
+      'activity_level' => '50',
+      'level' => '19',
+      'rating' => '700',
+      'wins' => '1337',
+      'losses' => '7331',
+      'num_territories' => '2',
+      'conquest_rating' => '5',
+      'result' => true,
+    }.merge(opts)
+  end
+
   describe '!faction' do
     before :each do
       @conn = FakeConnection.new
@@ -35,19 +51,7 @@ describe Cinch::Plugins::TyrantFaction do
     let(:message) { make_message(bot, '!faction testfaction', channel: '#test') }
 
     it 'shows faction info' do
-      @conn.respond('applyToFaction', 'faction_id=9001', {
-        'faction_id' => '9001',
-        'name' => 'testfaction',
-        'num_members' => '4',
-        'activity_level' => '50',
-        'level' => '19',
-        'rating' => '700',
-        'wins' => '1337',
-        'losses' => '7331',
-        'num_territories' => '2',
-        'conquest_rating' => '5',
-        'result' => true,
-      })
+      @conn.respond('applyToFaction', 'faction_id=9001', make_faction)
       @conn.respond('leaveFaction', '', { 'result' => true })
       expect(get_replies_text(message)).to be == [
         'testfaction: 4 members (50% active), Level 19, 700 FP, 1337/7331 W/L, 5 CR, 2 tiles'
