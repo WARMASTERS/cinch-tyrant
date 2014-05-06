@@ -70,10 +70,90 @@ describe Cinch::Plugins::TyrantFaction do
         'Failed to get info on "testfaction". This probably means they disbanded.'
       ]
     end
+
+    describe '!faction -c on other faction' do
+      let(:message) { make_message(bot, '!faction -c testfaction', channel: '#test') }
+
+      before :each do
+        @conn.respond('applyToFaction', 'faction_id=9001', make_faction({
+          'conquest_attacks' => 4,
+          'conquest_attack_recharge' => Time.now.to_i - 3600,
+        }))
+        @conn.respond('leaveFaction', '', { 'result' => true })
+      end
+
+      context 'with a master' do
+        before :each do
+          message.user.stub(:master?).and_return(true)
+        end
+
+        it 'shows conquest attacks' do
+          expect(get_replies_text(message)).to be == [
+            'testfaction: 4 members (50% active), Level 19, 700 FP, 1337/7331 W/L, 5 CR, 2 tiles',
+            '4/6 attacks - next in 03:00:00'
+          ]
+        end
+      end
+
+      context 'with a normal user' do
+        before :each do
+          message.user.stub(:master?).and_return(false)
+        end
+
+        it 'does not show conquest attacks' do
+          expect(get_replies_text(message)).to be == [
+            'testfaction: 4 members (50% active), Level 19, 700 FP, 1337/7331 W/L, 5 CR, 2 tiles',
+          ]
+        end
+      end
+    end
+
+    describe '!faction -c on own faction' do
+      let(:message) { make_message(bot, '!faction -c myfaction', channel: '#test') }
+      let(:faction_name) { 'myfaction' }
+      let(:faction_id) { 1000 }
+
+      before :each do
+        @conn.respond('applyToFaction', 'faction_id=1000', make_faction({
+          'faction_id' => '1000',
+          'name' => 'myfaction',
+          'conquest_attacks' => 4,
+          'conquest_attack_recharge' => Time.now.to_i - 3600,
+        }))
+        @conn.respond('leaveFaction', '', { 'result' => true })
+      end
+
+      context 'with a master' do
+        before :each do
+          message.user.stub(:master?).and_return(true)
+        end
+
+        it 'shows conquest attacks' do
+          expect(get_replies_text(message)).to be == [
+            'myfaction: 4 members (50% active), Level 19, 700 FP, 1337/7331 W/L, 5 CR, 2 tiles',
+            '4/6 attacks - next in 03:00:00'
+          ]
+        end
+      end
+
+      context 'with a normal user' do
+        before :each do
+          message.user.stub(:master?).and_return(false)
+        end
+
+        it 'shows conquest attacks' do
+          expect(get_replies_text(message)).to be == [
+            'myfaction: 4 members (50% active), Level 19, 700 FP, 1337/7331 W/L, 5 CR, 2 tiles',
+            '4/6 attacks - next in 03:00:00'
+          ]
+        end
+      end
+    end
   end
 
+  # TODO: !faction -m and !faction -f specs
+
   # TODO: !faction repeat wrong names specs
-  # TODO: !faction flags specs
   # TODO: !factionid specs
   # TODO: !link specs
 end
