@@ -20,6 +20,7 @@ module Cinch; module Plugins; class TyrantCard
   match(/c hash (\d+)/i, method: :chash)
   match(/unhash (.+)/i, method: :unhash)
   match(/dehash (.+)/i, method: :unhash)
+  match(/recard/i, method: :recard)
 
   COMMANDS = [
     Cinch::Tyrant::Cmd.new('card', 'card', '[-l] <name>', true,
@@ -241,5 +242,22 @@ module Cinch; module Plugins; class TyrantCard
       m.reply('Invalid base64 characters: ' + invalid)
     end
     m.reply(hash + ': ' + deck.join(', '))
+  end
+
+  def recard(m)
+    return unless m.user.master?
+
+    file = config[:xml_file]
+    unless file
+      m.reply('No XML file defined.')
+      return
+    end
+
+    by_id, by_name = ::Tyrant::Cards::parse_cards(config[:xml_file])
+    shared[:cards_by_id] = by_id
+    shared[:cards_by_name] = by_name
+    @cards_by_id = by_id
+    @cards_by_name = by_name
+    m.reply('Recarded.')
   end
 end; end; end

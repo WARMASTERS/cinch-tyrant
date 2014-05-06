@@ -6,7 +6,7 @@ describe Cinch::Plugins::TyrantCard do
   include Cinch::Test
 
   let(:bot) {
-    make_bot(Cinch::Plugins::TyrantCard) { |c|
+    make_bot(Cinch::Plugins::TyrantCard, :xml_file => 'testcards.xml') { |c|
       self.loggers.stub('debug') { nil }
     }
   }
@@ -89,5 +89,37 @@ describe Cinch::Plugins::TyrantCard do
     let(:message) { make_message(bot, '!dehash ACAB', channel: '#test') }
 
     it_behaves_like 'a command that converts hash to names'
+  end
+
+  describe '!recard' do
+    let(:message) { make_message(bot, '!recard', channel: '#test') }
+    let(:newcard1) { FakeCard.new(1, 'Star War The Fourth Gathers') }
+    let(:newcard2) { FakeCard.new(2, 'A New Card') }
+
+    before :each do
+      message.user.stub(:master?).and_return(true)
+      expect(Tyrant::Cards).to receive(:parse_cards).and_return([
+        { 1 => newcard1, 2 => newcard2, },
+        { 'star war the fourth gathers' => newcard1, 'a new card' => newcard2 },
+      ])
+      @replies = get_replies_text(message)
+    end
+
+    it 'reads card file' do
+      expect(@replies).to be == ['Recarded.']
+    end
+
+
+    it 'updates the cards-by-name hash' do
+      replies = get_replies_text(make_message(bot, '!card a new card', channel: '#test'))
+      # Kind of "displays the card". cinch convert it to_s for us.
+      expect(replies).to be == [newcard2]
+    end
+
+    it 'updates the cards-by-ID hash' do
+      replies = get_replies_text(make_message(bot, '!card [1]', channel: '#test'))
+      # Kind of "displays the card". cinch convert it to_s for us.
+      expect(replies).to be == [newcard1]
+    end
   end
 end
