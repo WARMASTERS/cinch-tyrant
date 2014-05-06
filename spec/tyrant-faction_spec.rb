@@ -45,10 +45,12 @@ describe Cinch::Plugins::TyrantFaction do
       # Pretend the yaml file exists, then load a dummy object from it.
       expect(File).to receive(:exist?).with('lolz').and_return(true)
       expect(YAML).to receive(:load_file).with('lolz').and_return(@factions)
-      expect(@factions).to receive(:get_first).with('testfaction').and_return(9001)
+      expect(@factions).to receive(:get_first).with(faction_name).and_return(faction_id)
     end
 
     let(:message) { make_message(bot, '!faction testfaction', channel: '#test') }
+    let(:faction_name) { 'testfaction' }
+    let(:faction_id) { 9001 }
 
     it 'shows faction info' do
       @conn.respond('applyToFaction', 'faction_id=9001', make_faction)
