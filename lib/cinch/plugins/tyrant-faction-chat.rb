@@ -102,7 +102,9 @@ module Cinch; module Plugins; class TyrantFactionChat
         # TODO: Have this update the cache?
         tyrant = Tyrants.get(faction.user)
         members = tyrant.get_faction_members
-        perm = members[m['user_id'].to_s]['permission_level'].to_i
+        member = members[m['user_id'].to_s]
+        next unless member
+        perm = member['permission_level'].to_i
         level = Cinch::Tyrant::Auth::DEFAULT_PERMISSIONS[perm]
         nick = match[1]
         code = match[2]
