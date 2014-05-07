@@ -87,18 +87,19 @@ module Cinch; module Plugins; class TyrantFactionChat
     }
   end
 
-  REGISTRATION_MESSAGE = /^#{BOT_NICK}\s+confirm\s+(\w+)\s+(\w+)$/i
 
   def check_chat(channel, faction)
     new_messages = faction.check
     return if new_messages.nil?
+    registration_regex = /^#{bot.nick}\s+confirm\s+(\w+)\s+(\w+)$/i
+
     new_messages.each { |m|
       user = ::Tyrant.get_name_of_id(m['user_id'])
 
       msg = "[FACTION] #{user}: #{m['message'] ? m['message'].sanitize : 'nil'}"
       Channel(channel).send(msg)
 
-      if (match = REGISTRATION_MESSAGE.match(m['message']))
+      if (match = registration_regex.match(m['message']))
         # TODO: Have this update the cache?
         tyrant = Tyrants.get(faction.user)
         members = tyrant.get_faction_members
