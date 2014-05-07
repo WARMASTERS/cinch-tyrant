@@ -1,9 +1,4 @@
 module Settings
-  Player = Struct.new(
-    'Player',
-    :user_id, :auth_token, :flash_code, :faction_id, :faction_name, :platform
-  )
-
   TYRANT_VERSION = raise 'You must set a tyrant version'
   USER_AGENT = raise 'You must set a user agent'
   TYRANT_DIR = raise 'You must set a Tyrant directory'
@@ -15,13 +10,13 @@ module Settings
   FACTIONS_YAML = "#{TYRANT_DIR}/factions.yaml"
 
   PLAYERS = {
-    'myplayer' => Player.new(
-      123456,
-      '111111222222333333444444555555666666777777888888999999aaaaaabbbb',
-      'ccccccddddddeeeeeeffffff00000011',
-      78910002,
-      'My Faction',
-      'kg'
-    ),
+    'myplayer' => {
+      user_id: 123456,
+      auth_token: '111111222222333333444444555555666666777777888888999999aaaaaabbbb',
+      flash_code: 'ccccccddddddeeeeeeffffff00000011',
+      faction_id: 78910002,
+      faction_name: 'My Faction',
+      platform: 'kg',
+    }
   }
 end
