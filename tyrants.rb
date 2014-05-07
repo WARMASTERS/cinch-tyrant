@@ -8,11 +8,6 @@ class Tyrants
   @@cache = {}
   @@kong_done = false
 
-  CONFIGS = {
-    :faction_yaml => Settings::FACTIONS_YAML,
-    :cards_xml => Settings::CARDS_XML,
-  }
-
   def self.get(name)
     if !@@kong_done
       Tyrant.kong_connection =
@@ -32,7 +27,6 @@ class Tyrants
       type: type,
       tyrant_version: Settings::TYRANT_VERSION,
       user_agent: Settings::USER_AGENT,
-      configs: CONFIGS,
       name: name,
       user_id: p[:user_id],
       flash_code: p[:flash_code],
