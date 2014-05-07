@@ -6,7 +6,7 @@ module Cinch; module Tyrant; class Faction
     @id = id
     @main_channel = main_channel
     @other_channels = other_channels
-    @player_function = player_f
+    @player = player_f
     @channel_map = channel_map
   end
 
@@ -15,7 +15,7 @@ module Cinch; module Tyrant; class Faction
   end
 
   def player
-    @player_function.call
+    @player.respond_to?(:call) ? @player.call : @player
   end
 
   def channel_for(sym)
