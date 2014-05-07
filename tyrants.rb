@@ -24,16 +24,11 @@ class Tyrants
     conn = Connection.new("#{platform}.tyrantonline.com", Settings::CACHE_DIR)
     @@cache[name] ||= Tyrant.new(
       connection: conn,
-      platform: platform,
       tyrant_version: Settings::TYRANT_VERSION,
       user_agent: Settings::USER_AGENT,
       name: name,
-      user_id: p[:user_id],
-      flash_code: p[:flash_code],
-      auth_token: p[:auth_token],
-      faction_id: p[:faction_id],
-      faction_name: p[:faction_name],
-      client_code_dir: Settings::CLIENT_CODE_DIR
+      client_code_dir: Settings::CLIENT_CODE_DIR,
+      **p
     )
   end
 end
