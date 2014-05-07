@@ -18,26 +18,37 @@ BOT_NICK = 'cinch-tyrant'
 # bot functionality.
 BOT_MASTERS = []
 
-# Faction ID identifies the faction associated with the channel.
-# It can be set regardless of membership in the faction.
-# Examples of faction-specific output that do not depend on faction
-# membership is conquest alerts and the !tiles command.
-#
-# player_f should only return a name of a player who is in the faction.
-# It is used for all faction-specific functions that require membership.
-# The faction ID tied to the player supercedes the faction set in this file
-# except in !conquest)
-#
-# A valid player and positive faction ID are needed for faction war alerts and
-# chat forwarding.
+# Array[Cinch::Tyrant::Faction] where each Faction represents a faction for
+# which this bot should serve faction-specific commands. Each Faction takes
+# arguments described below.
 BOT_FACTIONS = [
   Cinch::Tyrant::Faction.new(
-    1534002,
-    '#hole',
-    ['#holelead', '#holecq'],
-    lambda { 'EvilSplinter' },
-    {
-      :conquest => '#holelead',
+    # id: Recommended but not required.
+    # Indicates the Tyrant faction ID for this faction.
+    # This is required for notifications (conquest, faction chat, wars), and
+    # determines what tiles are owned by this faction (!tiles)
+    id: 1534002,
+    # main_channel: Required. A channel in which this bot will respond to
+    # commands, and to which this bot will send notifications.
+    main_channel: '#hole',
+    # other_channels: Optional. Additional channels in which this bot will
+    # respond to commands.
+    other_channels: ['#holelead', '#holecq'],
+    # player: Recommended but not required. Indicates a player name (in
+    # Settings::PLAYERS) who is a member of this faction. This will be used for
+    # any functionality that requires faction membership to check.
+    # Also supports a no-argument lambda that will return a player name.
+    # If not present, this bot will only perform functions that do not require
+    # faction membership.
+    player: 'my_hole_member',
+    # channel_map: Optional. By default, all notifications (:conquest,
+    # :faction_chat, :wars) are sent to the faction's main channel. If a
+    # certain type of notification should be sent to a different channel
+    # instead, this Hash[:notification_type => channel_name] allows this.
+    # In this eample, the Hole's faction chat and war notifications would go to
+    # #hole, but the conquest notifications would go to #holecq.
+    channel_map: {
+      :conquest => '#holecq',
     },
   ),
 ]
