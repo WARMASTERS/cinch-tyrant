@@ -1,17 +1,28 @@
 require 'cinch'
 
-require './bot-config'
-
 require 'cinch/tyrant/auth'
+require 'cinch/plugins/plugin-management'
 require 'cinch/plugins/tyrant-card'
+require 'cinch/plugins/tyrant-conquest'
+require 'cinch/plugins/tyrant-conquest-commands'
+require 'cinch/plugins/tyrant-conquest-poll'
+require 'cinch/plugins/tyrant-declare'
 require 'cinch/plugins/tyrant-faction'
 require 'cinch/plugins/tyrant-faction-chat'
+require 'cinch/plugins/tyrant-history'
 require 'cinch/plugins/tyrant-news'
 require 'cinch/plugins/tyrant-player'
+require 'cinch/plugins/tyrant-raids'
 require 'cinch/plugins/tyrant-register'
+require 'cinch/plugins/tyrant-say'
+require 'cinch/plugins/tyrant-stats'
+require 'cinch/plugins/tyrant-targets'
+require 'cinch/plugins/tyrant-tile'
+require 'cinch/plugins/tyrant-vault'
 require 'cinch/plugins/tyrant-war'
 require 'tyrant/cards'
 
+require './bot-config'
 require './tyrants'
 
 BOT_CHANNELS = {}
@@ -27,25 +38,8 @@ bot = Cinch::Bot.new do
     c.server = 'irc.mibbit.net'
     c.nick = BOT_NICK
     c.channels = CHANNELS_TO_JOIN
-    c.plugins.plugins = [
-      Cinch::Plugins::TyrantCard,
-      Cinch::Plugins::TyrantFaction,
-      Cinch::Plugins::TyrantFactionChat,
-      Cinch::Plugins::TyrantNews,
-      Cinch::Plugins::TyrantPlayer,
-      Cinch::Plugins::TyrantRegister,
-      Cinch::Plugins::TyrantWar,
-    ]
-    c.plugins.options[Cinch::Plugins::TyrantFaction] = {
-      :checker => 'mychecker',
-      :yaml_file => Settings::FACTIONS_YAML,
-    }
-    c.plugins.options[Cinch::Plugins::TyrantPlayer] = {
-      :checker => 'mychecker'
-    }
-    c.plugins.options[Cinch::Plugins::TyrantRegister] = {
-      :helpfile => 'http://www.example.com/'
-    }
+    c.plugins.plugins = BOT_PLUGINS
+    c.plugins.options = BOT_PLUGIN_OPTIONS
 
     by_id, by_name = Tyrant::Cards::parse_cards(Settings::CARDS_XML)
     c.shared[:cards_by_id] = by_id

@@ -26,10 +26,10 @@ Synapse Games.
     `settings.example.rb` by removing the `.example` portion:
     `rename .example.rb .rb *.example.rb`
   * Edit all settings in `settings.rb`, and add any Players necessary.
-  * Edit all settings in `bot-config.rb`, and add any Factions necessary.
-  * Enable any additional plugins by adding them to `bot.rb`: Add a `require`
-    for it, include its class in `c.plugins.plugins`, and add any configuration
-    options if necessary for that plugin.
+  * Edit all settings in `bot-config.rb`, add any Factions necessary, and add
+    any desired plugins to BOT_PLUGINS.
+  * You should not need to edit `bot.rb` after renaming it unless you have
+    special needs with Cinch.
   * Run it! `ruby bot.rb`
 
 ## Development
