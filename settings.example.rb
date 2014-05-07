@@ -1,7 +1,7 @@
 module Settings
   Player = Struct.new(
     'Player',
-    :user_id, :auth_token, :flash_code, :faction_id, :faction_name, :type
+    :user_id, :auth_token, :flash_code, :faction_id, :faction_name, :platform
   )
 
   TYRANT_VERSION = raise 'You must set a tyrant version'

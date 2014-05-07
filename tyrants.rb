@@ -20,11 +20,11 @@ class Tyrants
 
     p = Settings::PLAYERS[name]
     raise 'No tyrant player ' + name unless p
-    type = p[:type]
-    conn = Connection.new("#{type}.tyrantonline.com", Settings::CACHE_DIR)
+    platform = p[:platform]
+    conn = Connection.new("#{platform}.tyrantonline.com", Settings::CACHE_DIR)
     @@cache[name] ||= Tyrant.new(
       connection: conn,
-      type: type,
+      platform: platform,
       tyrant_version: Settings::TYRANT_VERSION,
       user_agent: Settings::USER_AGENT,
       name: name,
