@@ -1,5 +1,7 @@
 require 'cinch/tyrant/faction'
 
+# Array[String] with each string being a channel to join when bot starts.
+# Keys can be specified too with '#channelname key'.
 CHANNELS_TO_JOIN = [
   '#tyrant',
   '#hole',
@@ -7,7 +9,12 @@ CHANNELS_TO_JOIN = [
   '#holecq',
 ]
 
+# Nickname this bot should use.
 BOT_NICK = 'cinch-tyrant'
+
+# Array[String] with each string being a nick who is a "master" of the bot.
+# Masters (when identified to their nick) always have full access to all
+# bot functionality.
 BOT_MASTERS = []
 
 # Faction ID identifies the faction associated with the channel.
