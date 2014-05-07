@@ -105,10 +105,16 @@ BOT_IDS = {
 class Tyrants
   def self.get_fake(name, connection)
     Tyrant.new(
-      connection,
-      'faketype', 'fakeversion', 'fakeagent', {}, #configs
-      name, 1, 'flashcode', 'authtoken',
-      1000, 'faction 1000',
+      connection: connection,
+      platform: 'faketype',
+      tyrant_version: 'fakeversion',
+      user_agent: 'fakeagent',
+      name: name,
+      user_id: 1,
+      flash_code: 'flashcode',
+      auth_token: 'authtoken',
+      faction_id: 1000,
+      faction_name: 'faction 1000',
       client_code_dir: '/dev/null'
     )
   end

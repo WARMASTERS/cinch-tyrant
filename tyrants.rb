@@ -26,11 +26,19 @@ class Tyrants
     p = Settings::PLAYERS[name]
     raise 'No tyrant player ' + name unless p
     type = p[:type]
+    conn = Connection.new("#{type}.tyrantonline.com", Settings::CACHE_DIR)
     @@cache[name] ||= Tyrant.new(
-      Connection.new("#{type}.tyrantonline.com", Settings::CACHE_DIR),
-      type, Settings::TYRANT_VERSION, Settings::USER_AGENT, CONFIGS,
-      name, p[:user_id], p[:flash_code], p[:auth_token],
-      p[:faction_id], p[:faction_name],
+      connection: conn,
+      type: type,
+      tyrant_version: Settings::TYRANT_VERSION,
+      user_agent: Settings::USER_AGENT,
+      configs: CONFIGS,
+      name: name,
+      user_id: p[:user_id],
+      flash_code: p[:flash_code],
+      auth_token: p[:auth_token],
+      faction_id: p[:faction_id],
+      faction_name: p[:faction_name],
       client_code_dir: Settings::CLIENT_CODE_DIR
     )
   end
