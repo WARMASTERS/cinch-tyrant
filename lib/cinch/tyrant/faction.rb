@@ -1,12 +1,17 @@
 module Cinch; module Tyrant; class Faction
   attr_reader :id, :main_channel, :other_channels
 
-  def initialize(id, main_channel, other_channels,
-                 player_f, channel_map)
+  def initialize(
+    id: -1,
+    main_channel:,
+    other_channels: [],
+    player: nil,
+    channel_map: {}
+  )
     @id = id
     @main_channel = main_channel
     @other_channels = other_channels
-    @player_function = player_f
+    @player = player
     @channel_map = channel_map
   end
 
@@ -15,7 +20,7 @@ module Cinch; module Tyrant; class Faction
   end
 
   def player
-    @player_function.call
+    @player.respond_to?(:call) ? @player.call : @player
   end
 
   def channel_for(sym)

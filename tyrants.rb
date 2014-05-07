@@ -8,11 +8,6 @@ class Tyrants
   @@cache = {}
   @@kong_done = false
 
-  CONFIGS = {
-    :faction_yaml => Settings::FACTIONS_YAML,
-    :cards_xml => Settings::CARDS_XML,
-  }
-
   def self.get(name)
     if !@@kong_done
       Tyrant.kong_connection =
@@ -25,13 +20,15 @@ class Tyrants
 
     p = Settings::PLAYERS[name]
     raise 'No tyrant player ' + name unless p
-    type = p[:type]
+    platform = p[:platform]
+    conn = Connection.new("#{platform}.tyrantonline.com", Settings::CACHE_DIR)
     @@cache[name] ||= Tyrant.new(
-      Connection.new("#{type}.tyrantonline.com", Settings::CACHE_DIR),
-      type, Settings::TYRANT_VERSION, Settings::USER_AGENT, CONFIGS,
-      name, p[:user_id], p[:flash_code], p[:auth_token],
-      p[:faction_id], p[:faction_name],
-      client_code_dir: Settings::CLIENT_CODE_DIR
+      connection: conn,
+      tyrant_version: Settings::TYRANT_VERSION,
+      user_agent: Settings::USER_AGENT,
+      name: name,
+      client_code_dir: Settings::CLIENT_CODE_DIR,
+      **p
     )
   end
 end
