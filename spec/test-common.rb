@@ -193,7 +193,7 @@ end
 
 # =================== CARDS ===================
 
-FakeCard = Struct.new(:id, :name) do
+FakeCard = Struct.new(:id, :name, :type) do
   def hash
     Tyrant::Cards::hash_of_id(self[:id])
   end
