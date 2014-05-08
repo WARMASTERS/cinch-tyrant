@@ -102,6 +102,13 @@ BOT_PLUGIN_OPTIONS = {
       '#example' => [true, 30],
     },
   },
+  Cinch::Plugins::TyrantMission => {
+    # How many results can be displayed before bot instead says "Maybe you
+    # should narrow down a bit more."?
+    :max_matches => 15,
+    # Path to XML file missions.xml
+    :xml_file => Settings::MISSIONS_XML,
+  },
   Cinch::Plugins::TyrantNews => {
     # Hash[channel_name => [bool, int]] indicating whether to poll for that
     # channel, and the poll interval in minutes. Defaults to [true, 1]
