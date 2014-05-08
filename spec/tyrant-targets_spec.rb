@@ -32,8 +32,6 @@ describe Cinch::Plugins::TyrantTargets do
       expect(replies).to be == ['No targets!']
     end
 
-    # TODO: A bit silly that these tests return THE ENEMY twice.
-
     it 'shows the targets' do
       @conn.respond('getFactionRivals', 'rating%5Flow=0', {'rivals' => []})
       @conn.respond('getFactionRivals', 'rating%5Fhigh=0', {'rivals' => [
