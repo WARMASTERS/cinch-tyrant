@@ -54,6 +54,9 @@ module Cinch; module Plugins; class TyrantConquestCommands
     Cinch::Tyrant::Cmd.new('invasion', 'c slot', '<slot>', MEMBER_L,
       'Shows information about the specified slot'
     ),
+    Cinch::Tyrant::Cmd.new('invasion', 'c set', '<slot> <contents>', MEMBER_L,
+      'Sets the current contents of the specified slot'
+    ),
     Cinch::Tyrant::Cmd.new('invasion', 'c append', '<slot> <contents>', MEMBER_L,
       'Adds the contents to the current contents of the specified slot'
     ),
