@@ -15,8 +15,6 @@ describe Cinch::Plugins::TyrantSay do
     expect(bot).to be_a Cinch::Bot
   end
 
-  # TODO: !tile -v
-
   describe 'say' do
     before :each do
       @conn = FakeConnection.new
