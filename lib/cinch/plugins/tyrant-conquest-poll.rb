@@ -245,7 +245,7 @@ module Cinch; module Plugins; class TyrantConquestPoll
 
   def send_message(faction, tile, verb, enemy, enable_sym)
     return unless faction.monitor_opts[enable_sym]
-    prefix = '[' + Format(:bold, :green, :underline, 'CONQUEST') + '] '
+    prefix = '[CONQUEST] '
     Channel(faction.channel).send(prefix + tile + " #{verb} #{enemy}")
   end
 
