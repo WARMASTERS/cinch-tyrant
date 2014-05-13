@@ -41,7 +41,7 @@ describe Cinch::Plugins::TyrantNews do
     bot.plugins[0].get_timers[0].fire!
 
     expect(@chan.messages.shift).to be =~
-      /^.*WAR UP!!!\S*\s*1 - faction 1000 vs THE ENEMY 0-0 \(\+0\) \d\d:\d\d:\d\d left/
+      /^WAR UP!!!\s*1 - faction 1000 vs THE ENEMY 0-0 \(\+0\) \d\d:\d\d:\d\d left/
     expect(@chan.messages).to be == []
   end
 
@@ -88,7 +88,7 @@ describe Cinch::Plugins::TyrantNews do
       @conn.respond('getFactionWarInfo', "faction_war_id=1", @war)
       bot.plugins[0].get_timers[0].fire!
       expect(@chan.messages.shift).to be =~
-        /^.*VICTORY!!!\S*\s*1 - faction 1000 vs THE ENEMY 1-0 \(\+1\) 0d 00:00:\d\d ago, \+5 FP/
+        /^VICTORY!!!\s*1 - faction 1000 vs THE ENEMY 1-0 \(\+1\) 0d 00:00:\d\d ago, \+5 FP/
       expect(@chan.messages).to be == []
     end
 
@@ -102,7 +102,7 @@ describe Cinch::Plugins::TyrantNews do
       @conn.respond('getFactionWarInfo', "faction_war_id=1", @war)
       bot.plugins[0].get_timers[0].fire!
       expect(@chan.messages.shift).to be =~
-        /^.*Defeat!!!\S*\s*1 - faction 1000 vs THE ENEMY 0-1 \(\-1\) 0d 00:00:\d\d ago, -1 FP/
+        /^Defeat!!!\s*1 - faction 1000 vs THE ENEMY 0-1 \(\-1\) 0d 00:00:\d\d ago, -1 FP/
       expect(@chan.messages).to be == []
     end
 
