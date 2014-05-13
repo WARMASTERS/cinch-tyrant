@@ -44,8 +44,8 @@ describe Cinch::Plugins::TyrantConquestPoll do
 
   shared_examples 'gaining a tile' do
     it 'notifies my faction channel' do
-      expect(@chans[my_channel].messages.shift).to be =~
-      /^.*\[.*CONQUEST.*\]    2 \(  0,   0\) Conquered from faction 1001$/
+      expect(@chans[my_channel].messages.shift).to be ==
+        '[CONQUEST]    2 (  0,   0) Conquered from faction 1001'
       expect(@chans[my_channel].messages).to be == []
     end
 
@@ -58,8 +58,8 @@ describe Cinch::Plugins::TyrantConquestPoll do
 
   shared_examples 'losing a tile' do
     it 'notifies my faction channel' do
-      expect(@chans[my_channel].messages.shift).to be =~
-      /^.*\[.*CONQUEST.*\]    1 \(  0,   0\) Lost to faction 1001$/
+      expect(@chans[my_channel].messages.shift).to be ==
+        '[CONQUEST]    1 (  0,   0) Lost to faction 1001'
       expect(@chans[my_channel].messages).to be == []
     end
 
@@ -80,8 +80,8 @@ describe Cinch::Plugins::TyrantConquestPoll do
     end
 
     it 'notifies my faction channel' do
-      expect(@chans[my_channel].messages.shift).to be =~
-        /^.*\[.*CONQUEST.*\]    2 \(  0,   0\) New invasion against faction 1001$/
+      expect(@chans[my_channel].messages.shift).to be ==
+        '[CONQUEST]    2 (  0,   0) New invasion against faction 1001'
       expect(@chans[my_channel].messages).to be == []
     end
 
@@ -115,8 +115,8 @@ describe Cinch::Plugins::TyrantConquestPoll do
     end
 
     it 'notifies my faction channel' do
-      expect(@chans[my_channel].messages.shift).to be =~
-        /^.*\[.*CONQUEST.*\]    1 \(  0,   0\) Under attack by faction 1001$/
+      expect(@chans[my_channel].messages.shift).to be ==
+        '[CONQUEST]    1 (  0,   0) Under attack by faction 1001'
       expect(@chans[my_channel].messages).to be == []
     end
 

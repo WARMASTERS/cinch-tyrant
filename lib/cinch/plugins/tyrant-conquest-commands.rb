@@ -135,7 +135,7 @@ module Cinch; module Plugins; class TyrantConquestCommands
 
     last_check_ago = Time.now.to_i - faction.last_check
     if last_check_ago >= MINUTE
-      warning = Format(:bold, :red, :underline, 'WARNING!')
+      warning = 'WARNING!'
       m.reply(warning + ' Last check was over a minute ago! ' +
               'Run "!cnews invasion_monitor on" (ops only)')
     end
@@ -389,7 +389,7 @@ module Cinch; module Plugins; class TyrantConquestCommands
       change_time = TyrantConquest::safe_time_ago(slot_info[:change_time])
 
       if slot_info.change_time && slot_info.change_time >= slot_info.deck_set_time
-        ood = Format(:bold, :red, '(Out of date!)') + ' '
+        ood = '(Out of date!) '
       else
         ood = ''
       end
