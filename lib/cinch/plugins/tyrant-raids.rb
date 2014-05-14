@@ -57,7 +57,7 @@ module Cinch; module Plugins; class TyrantRaids
   end
 
   def raid_id(m, k, raid_id)
-    return unless is_friend?(m)
+    return unless m.channel ? is_friend?(m) : m.user.master?
 
     tyrant = Tyrants.get(config[:checker])
 
@@ -81,7 +81,7 @@ module Cinch; module Plugins; class TyrantRaids
   end
 
   def raid_user(m, k, user)
-    return unless is_friend?(m)
+    return unless m.channel ? is_friend?(m) : m.user.master?
 
     id = ::Tyrant.get_id_of_name(user)
     if id.nil?
