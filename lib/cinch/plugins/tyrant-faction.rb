@@ -77,7 +77,7 @@ module Cinch; module Plugins; class TyrantFaction
     return if !m.channel && !m.user.master?
     return if m.channel && !is_friend?(m)
 
-    if @failures[m.channel.name] == faction_name && !m.user.master?
+    if m.channel && @failures[m.channel.name] == faction_name && !m.user.master?
       m.reply('No, I really don\'t know about that faction, ' +
               'so please stop trying. It won\'t help.', true)
       return
