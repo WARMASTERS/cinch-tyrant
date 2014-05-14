@@ -131,12 +131,12 @@ module Cinch; module Plugins; class TyrantNews
         we_win = our_score > their_score || defense && our_score == their_score
 
         prefix = we_win ? 'VICTORY!!!' : 'Defeat!!!'
-        Channel(channel).send("#{prefix} #{faction.format(war)}")
+        Channel(channel).send("[WAR] #{prefix} #{faction.format(war)}")
       }
       new_wars.each { |war|
         defense_war = war['defender_faction_id'].to_i == faction.faction_id
         prefix = defense_war ? 'ALARUM!!! DEFENSE WAR!!!' : 'WAR UP!!!'
-        Channel(channel).send("#{prefix} #{faction.format(war)}")
+        Channel(channel).send("[WAR] #{prefix} #{faction.format(war)}")
       }
     }
   end
