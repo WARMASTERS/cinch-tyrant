@@ -45,6 +45,29 @@ describe Cinch::Plugins::TyrantNews do
     expect(@chan.messages).to be == []
   end
 
+  it 'informs the channel of a new defensive war' do
+    @chan = FakeChannel.new
+    bot.plugins[0].stub(:Channel) { |n| @chan }
+    wars = { 'wars' => {
+      '1' => {
+        'faction_war_id' => '1',
+        'name' => 'THE ENEMY',
+        'attacker_faction_id' => '1001',
+        'defender_faction_id' => '1000',
+        'start_time' => Time.now.to_i.to_s,
+        'duration' => '6',
+        'atk_pts' => '0',
+        'def_pts' => '0',
+      },
+    }}
+    @conn.respond('getActiveFactionWars', '', wars)
+    bot.plugins[0].get_timers[0].fire!
+
+    expect(@chan.messages.shift).to be =~
+      /^\[WAR\] ALARUM!!! DEFENSE WAR!!!\s*1 - THE ENEMY vs faction 1000 0-0 \(\+0\) \d\d:\d\d:\d\d left/
+    expect(@chan.messages).to be == []
+  end
+
   context 'when offensive war has ended' do
     before :each do
       @chan = FakeChannel.new
