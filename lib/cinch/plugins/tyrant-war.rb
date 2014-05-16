@@ -146,7 +146,7 @@ module Cinch; module Plugins; class TyrantWar
       stats = us.find { |x| x['user_id'].to_i == id.to_i }
       stats ||= them.find { |x| x['user_id'].to_i == id.to_i }
       unless stats
-        m.reply(player + ' not found')
+        m.reply(player + ' has not participated in this war')
         return
       end
 
