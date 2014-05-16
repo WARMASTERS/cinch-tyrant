@@ -24,8 +24,10 @@ module Cinch; module Plugins; class TyrantFaction
   match(/update conquest/i, method: :update_conquest)
 
   COMMANDS = [
-    Cinch::Tyrant::Cmd.new('factions', 'faction', '<name>', true,
-      'Looks up information of the named faction.'
+    Cinch::Tyrant::Cmd.new('factions', 'faction', '[flags] [name]', true,
+      'Looks up information of the named faction ' +
+      '(default this channel\'s faction). ' +
+      'Flags: -c: Conquest attacks, -f: Founder, -m: Message.'
     ),
     Cinch::Tyrant::Cmd.new('factions', 'link', '<name>',
       lambda { |m| is_warmaster?(m) },
