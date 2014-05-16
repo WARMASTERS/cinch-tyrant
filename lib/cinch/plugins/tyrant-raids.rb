@@ -25,7 +25,7 @@ module Cinch; module Plugins; class TyrantRaids
     ),
     Cinch::Tyrant::Cmd.new('raids', 'raids', '<raidtype>', true,
       'Displays public raids of the specified type. ' +
-      'Raids may be specified by numeric ID, full name, or abbreviation.'
+      'Raids may be specified by numeric ID, full name, initials, or prefix.'
     ),
   ]
 
