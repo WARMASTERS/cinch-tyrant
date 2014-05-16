@@ -9,7 +9,7 @@ module Cinch; module Plugins; class TyrantConquest
   match(/(?:conquest|tiles)( -v)?(?: (.+))?/i, method: :conquest)
 
   COMMANDS = [
-    Cinch::Tyrant::Cmd.new('conquest', 'conquest', '[faction]', true,
+    Cinch::Tyrant::Cmd.new('conquest', 'tiles', '[faction]', true,
       'Shows information on tiles the specified faction (default us) ' +
       'own or are attacking'
     ),

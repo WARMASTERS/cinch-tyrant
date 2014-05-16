@@ -38,7 +38,7 @@ module Cinch; module Plugins; class TyrantTile
   COMMANDS = [
     Cinch::Tyrant::Cmd.new('conquest', 'tile', '<tile>', true,
       'Shows info about the specified tile. ' +
-      'Tiles may be specified by coordinates or ID (from !conquest).'
+      'Tiles may be specified by coordinates or ID (from !tiles).'
     ),
   ]
 
