@@ -104,7 +104,7 @@ module Cinch; module Plugins; class TyrantRaids
       raid_id = @raid_names[key]
     else
       best_dist = 1.0 / 0.0
-      @raid_names.each { |x, id|
+      @raid_names.merge(@initials).each { |x, id|
         dist = Levenshtein.distance(x, req)
         if dist < best_dist
           best_dist = dist
