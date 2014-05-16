@@ -36,9 +36,6 @@ module Cinch; module Plugins; class TyrantCard
     Cinch::Tyrant::Cmd.new('card', 'unhash', '<hash>', true,
       'Decodes standard deck hash (base64) into card names.'
     ),
-    Cinch::Tyrant::Cmd.new('card', 'dehash', '<hash>', true,
-      'Alias of unhash.'
-    ),
     Cinch::Tyrant::Cmd.new('invasion', 'c hash', '<slot>',
       lambda { |m| is_member?(m) },
       'Gives deck hash of the specified slot.'

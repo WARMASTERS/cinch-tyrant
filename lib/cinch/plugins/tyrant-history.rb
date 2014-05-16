@@ -15,10 +15,6 @@ module Cinch; module Plugins; class TyrantHistory
       lambda { |m| is_member?(m) },
       'Shows the last n (default 1) wars against the specified opponent (default all opponents)'
     ),
-    Cinch::Tyrant::Cmd.new('war', 'history', '[n] [name]',
-      lambda { |m| is_member?(m) },
-      'Alias of !last'
-    ),
   ]
 
   FLOOD_INITIAL_TIME = 3
