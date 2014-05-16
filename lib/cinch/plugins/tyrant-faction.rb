@@ -19,7 +19,7 @@ module Cinch; module Plugins; class TyrantFaction
 
   match(/f(?:action)?(\s+-[a-z]+)?(?:\s+(.+))?/i, method: :faction)
   match(/f(?:action)?id\s+(-[a-z]+\s+)?(\d+)/i, method: :faction_id)
-  match(/link (.*)/i, method: :link)
+  match(/link(?: (.*))?/i, method: :link)
   match(/update rankings/i, method: :update_rankings)
   match(/update conquest/i, method: :update_conquest)
 
@@ -29,7 +29,11 @@ module Cinch; module Plugins; class TyrantFaction
       '(default this channel\'s faction). ' +
       'Flags: -c: Conquest attacks, -f: Founder, -m: Message.'
     ),
-    Cinch::Tyrant::Cmd.new('factions', 'link', '<name>',
+    Cinch::Tyrant::Cmd.new('factions', 'link', '',
+      lambda { |m| is_member?(m) },
+      'Shows apply link of this channel\'s faction.'
+    ),
+    Cinch::Tyrant::Cmd.new('factions', 'link', '<faction>',
       lambda { |m| is_warmaster?(m) },
       'Shows apply link of the named faction.'
     ),
@@ -54,13 +58,22 @@ module Cinch; module Plugins; class TyrantFaction
   def link(m, faction_name)
     # To trigger, must be me and PM, or in an allowed channel
     return if !m.channel && !m.user.master?
-    return if m.channel && !is_warmaster?(m)
+    return if m.channel && !is_member?(m)
 
-    faction_id = @factions.get_first(faction_name)
-    if !faction_id
-      m.reply("#{faction_name} not found")
-      return
+    if faction_name
+      if !m.channel || is_warmaster?(m)
+        faction_id = @factions.get_first(faction_name)
+        if !faction_id
+          m.reply("#{faction_name} not found")
+          return
+        end
+      else
+        return
+      end
+    else
+      faction_id = BOT_CHANNELS[m.channel.name].id
     end
+
     m.reply("http://www.kongregate.com/games/synapticon/tyrant?kv_apply=#{faction_id}")
   end
 
