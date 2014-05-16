@@ -32,6 +32,28 @@ describe Cinch::Plugins::TyrantFaction do
     }.merge(opts)
   end
 
+  describe '!faction without args' do
+    let(:message) { make_message(bot, '!faction', channel: '#test') }
+
+    before :each do
+      @conn = FakeConnection.new
+      @tyrant = Tyrants.get_fake('checker', @conn)
+      expect(Tyrants).to receive(:get).with('checker').and_return(@tyrant)
+      @conn.respond('applyToFaction', 'faction_id=1000', make_faction({
+        'faction_id' => '1000',
+        'name' => 'myfaction',
+      }))
+      @conn.respond('leaveFaction', '', { 'result' => true, })
+    end
+
+    it 'displays information of own faction' do
+      expect(get_replies_text(message)).to be == [
+        'myfaction: 4 members (50% active), Level 19, 700 FP, 1337/7331 W/L, 5 CR, 2 tiles',
+      ]
+    end
+  end
+
+
   describe '!faction' do
     before :each do
       @conn = FakeConnection.new

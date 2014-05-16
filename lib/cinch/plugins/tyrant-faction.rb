@@ -17,7 +17,7 @@ module Cinch; module Plugins; class TyrantFaction
     @failures = {}
   end
 
-  match(/f(?:action)?\s+(-[a-z]+\s+)?(.*)/i, method: :faction)
+  match(/f(?:action)?(\s+-[a-z]+)?(?:\s+(.+))?/i, method: :faction)
   match(/f(?:action)?id\s+(-[a-z]+\s+)?(\d+)/i, method: :faction_id)
   match(/link (.*)/i, method: :link)
   match(/update rankings/i, method: :update_rankings)
@@ -77,7 +77,8 @@ module Cinch; module Plugins; class TyrantFaction
     return if !m.channel && !m.user.master?
     return if m.channel && !is_friend?(m)
 
-    if m.channel && @failures[m.channel.name] == faction_name && !m.user.master?
+    last_fail = m.channel && @failures[m.channel.name]
+    if faction_name && last_fail == faction_name && !m.user.master?
       m.reply('No, I really don\'t know about that faction, ' +
               'so please stop trying. It won\'t help.', true)
       return
@@ -85,7 +86,17 @@ module Cinch; module Plugins; class TyrantFaction
 
     # Remember, this quits your faction, so only run with dummy accounts
     tyrant = Tyrants.get(config[:checker])
-    faction_id = @factions.get_first(faction_name)
+
+    # If name provided, use it.
+    # If not, use the faction associated with this channel, if any.
+    if faction_name
+      faction_id = @factions.get_first(faction_name)
+    elsif m.channel && BOT_CHANNELS[m.channel.name]
+      faction_id = BOT_CHANNELS[m.channel.name].id
+    else
+      return
+    end
+
     if !faction_id
       @failures[m.channel.name] = faction_name if m.channel
       @keys.sort_by! { |x| Levenshtein.distance(x, faction_name.downcase) }
