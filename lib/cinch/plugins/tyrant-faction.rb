@@ -17,7 +17,7 @@ module Cinch; module Plugins; class TyrantFaction
     @failures = {}
   end
 
-  match(/f(?:action)?(\s+-[a-z]+)?(?:\s+(.+))?/i, method: :faction)
+  match(/f(?:action)?(\s+-[a-z]+)?(?:\s+(.+))?$/i, method: :faction)
   match(/f(?:action)?id\s+(-[a-z]+\s+)?(\d+)/i, method: :faction_id)
   match(/link(?: (.*))?/i, method: :link)
   match(/update rankings/i, method: :update_rankings)
