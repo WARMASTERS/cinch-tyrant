@@ -41,6 +41,16 @@ describe Cinch::Plugins::TyrantCard do
     end
   end
 
+  describe '!card by id without brackets' do
+    let(:message) { make_message(bot, '!card 2', channel: '#test') }
+
+    it 'displays the card' do
+      replies = get_replies_text(message)
+      # Kind of "displays the card". cinch convert it to_s for us.
+      expect(replies).to be == [card2]
+    end
+  end
+
   describe '!card by id' do
     let(:message) { make_message(bot, '!card [2]', channel: '#test') }
 

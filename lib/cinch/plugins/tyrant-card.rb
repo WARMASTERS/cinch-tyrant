@@ -6,7 +6,7 @@ require 'tyrant/levenshtein'
 module Cinch; module Plugins; class TyrantCard
   include Cinch::Plugin
 
-  ID_REGEX = /.*\[(\d+)\]/
+  ID_REGEX = /.*\[(\d+)\]|(^\s*\d+\s*$)/
   BASE64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' +
            'abcdefghijklmnopqrstuvwxyz' +
            '0123456789+/'
@@ -57,7 +57,7 @@ module Cinch; module Plugins; class TyrantCard
   def resolve_card(name, num_suggestions = 3)
     match = ID_REGEX.match(name)
     if match
-      id = match[1].to_i
+      id = match[1] ? match[1].to_i : match[2].to_i
       c = @cards_by_id[id]
       return [c, []] unless c.nil?
 
