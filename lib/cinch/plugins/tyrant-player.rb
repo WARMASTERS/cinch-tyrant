@@ -261,8 +261,9 @@ module Cinch; module Plugins; class TyrantPlayer
 
     return if tyrant.nil? || !is_member?(m)
 
-    wars = tyrant.get_old_wars(days).map { |war| war['faction_war_id'] }
-    player = tyrant.war_reports(wars) { |p|
+    wars = tyrant.get_old_wars(days)
+    war_ids = wars.map { |war| war['faction_war_id'] }
+    player = tyrant.war_reports(war_ids) { |p|
       p['user_id'].to_i == json['user_data']['user_id'].to_i
     }.values[0]
 
@@ -279,5 +280,13 @@ module Cinch; module Plugins; class TyrantPlayer
     fmt = '%d/%d attack, %d/%d defense, %d points, %d net, %d wars'
     m.reply("#{days}-day totals: #{fmt % totals}")
     m.reply("#{days}-day averages: #{fmt % averages}")
+
+    if player.last_war
+      war = wars.find { |w| w['faction_war_id'] == player.last_war }
+      war_info = tyrant.format_wars([war])
+      m.reply("#{player_name} last attacked in this war: #{war_info}")
+    else
+      m.reply("#{player_name} has not attacked in the last #{days} days.")
+    end
   end
 end; end; end
