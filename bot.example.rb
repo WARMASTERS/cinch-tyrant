@@ -38,6 +38,7 @@ bot = Cinch::Bot.new do
   configure do |c|
     c.server = 'irc.mibbit.net'
     c.nick = BOT_NICK
+    c.realname = 'https://github.com/WARMASTERS/cinch-tyrant'
     c.channels = CHANNELS_TO_JOIN
     c.plugins.plugins = BOT_PLUGINS
     c.plugins.options = BOT_PLUGIN_OPTIONS
