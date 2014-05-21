@@ -104,8 +104,8 @@ module Cinch; module Plugins; class TyrantFactionChat
         tyrant = Tyrants.get(faction.user)
         members = tyrant.get_faction_members
         member = members[m['user_id'].to_s]
-        next unless member
-        perm = member['permission_level'].to_i
+        # Not found? Cache probably stale. Assume member.
+        perm = member ? member['permission_level'].to_i : 1
         level = Cinch::Tyrant::Auth::DEFAULT_PERMISSIONS[perm]
         nick = match[1]
         code = match[2]
