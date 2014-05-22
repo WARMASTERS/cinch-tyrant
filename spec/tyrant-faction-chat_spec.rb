@@ -32,13 +32,23 @@ describe Cinch::Plugins::TyrantFactionChat do
     expect(@chan.messages).to be == []
   end
 
-  it 'does nothing if there are no new messages' do
-    @conn.respond('getNewFactionMessages', 'last_post=60', {'messages' => [
-      {'post_id' => '61', 'message' => 'm2', 'user_id' => '2'},
-    ]})
-    expect(Tyrant).to receive(:get_name_of_id).with('2').and_return('usertwo')
-    bot.plugins[0].get_timers[0].fire!
-    expect(@chan.messages).to be == ['[FACTION] usertwo: m2']
+  context 'with new messages' do
+    before :each do
+      @conn.respond('getNewFactionMessages', 'last_post=60', {'messages' => [
+        {'post_id' => '61', 'message' => 'm2', 'user_id' => '2'},
+      ]})
+      expect(Tyrant).to receive(:get_name_of_id).with('2').and_return('usertwo')
+      bot.plugins[0].get_timers[0].fire!
+    end
+
+    it 'posts new messages' do
+      expect(@chan.messages).to be == ['[FACTION] usertwo: m2']
+    end
+
+    it 'updates last post before doing next poll' do
+      @conn.respond('getNewFactionMessages', 'last_post=61', {'messages' => []})
+      bot.plugins[0].get_timers[0].fire!
+    end
   end
 
   # TODO: !chat (on|off)
