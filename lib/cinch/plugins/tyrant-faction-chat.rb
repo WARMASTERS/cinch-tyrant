@@ -54,7 +54,7 @@ module Cinch; module Plugins; class TyrantFactionChat < TyrantPoll
     :faction_chat
   end
 
-  def notify(channel, faction, new_messages)
+  def notify(faction, channels, new_messages)
     return if new_messages.nil?
     registration_regex = /^#{bot.nick}\s+confirm\s+(\w+)\s+(\w+)$/i
 
@@ -62,7 +62,7 @@ module Cinch; module Plugins; class TyrantFactionChat < TyrantPoll
       user = ::Tyrant.get_name_of_id(m['user_id'])
 
       msg = "[FACTION] #{user}: #{m['message'] ? m['message'].sanitize : 'nil'}"
-      Channel(channel).send(msg)
+      channels.each { |c| Channel(c).send(msg) }
 
       if (match = registration_regex.match(m['message']))
         # TODO: Have this update the cache?
@@ -76,7 +76,11 @@ module Cinch; module Plugins; class TyrantFactionChat < TyrantPoll
         success = Cinch::Tyrant::Auth::confirm_register(
           faction.faction_id, m['user_id'].to_i, nick, level, code
         )
-        Channel(channel).send(nick + ': Thank you for registering.') if success
+        if success
+          channels.each { |c|
+            Channel(c).send(nick + ': Thank you for registering.')
+          }
+        end
       end
     }
     shared[:last_faction_chat][faction.faction_id] = faction.last

@@ -11,14 +11,12 @@ module Cinch; module Plugins; class TyrantPoll
   DEFAULT_SETTINGS = [true, 1]
 
   class MonitoredFaction
-    attr_accessor :monitor
-    attr_reader :user, :tyrant
+    attr_reader :user, :tyrant, :channels
 
-    def initialize(user, monitor, multiplier)
+    def initialize(user, channels)
       @user = user
       @tyrant = Tyrants.get(user)
-      @monitor = monitor
-      @multiplier = multiplier
+      @channels = channels
       @count = 1
       @fail_count = 0
     end
@@ -26,9 +24,12 @@ module Cinch; module Plugins; class TyrantPoll
     def faction_id; @tyrant.faction_id; end
 
     def check
-      return if not @monitor
       @count += 1
-      return if @count % @multiplier != 0
+      channels_who_care = @channels.to_a.select { |chan, a|
+        enabled, interval = a
+        enabled && @count % interval == 0
+      }.map { |chan, a| chan }
+      return [[], nil] if channels_who_care.empty?
 
       reinit = @fail_count > RETRIES
       json = @tyrant.make_request(poll_name, poll_params, reinit: reinit)
@@ -42,7 +43,7 @@ module Cinch; module Plugins; class TyrantPoll
         @fail_count = 0
       end
 
-      poll_result(json)
+      [channels_who_care, poll_result(json)]
     end
   end
 
@@ -53,37 +54,46 @@ module Cinch; module Plugins; class TyrantPoll
   def initialize(*args)
     super
     @factions = {}
+    @channels = {}
 
     channel_configs = config[:channels] || {}
 
     BOT_FACTIONS.each { |faction|
       next if faction.id < 0 || faction.player.nil?
-      channel = faction.channel_for(notification_type)
-      args = channel_configs[channel] || DEFAULT_SETTINGS
-      @factions[channel] = monitored_faction.new(faction.player, *args)
+      channels = faction.channel_for(notification_type)
+      channels = [channels] unless channels.is_a?(Array)
+
+      configs = channels.map { |c|
+        [c, channel_configs[c] || DEFAULT_SETTINGS.dup]
+      }.to_h
+      mf = monitored_faction.new(faction.player, configs)
+      @factions[faction.id] = mf
+      channels.each { |c| @channels[c] = mf }
     }
   end
 
   def check_all
     @factions.each { |channel, faction|
-      notify(channel, faction, faction.check)
+      channels_who_care, data = faction.check
+      next if channels_who_care.empty?
+      notify(faction, channels_who_care, data)
     }
   end
 
   def execute(m, switch)
     user_good = is_officer?(m)
-    channel_good = @factions.keys.include?(m.channel.name)
+    channel_good = @channels.has_key?(m.channel.name)
     return unless user_good && channel_good
 
-    faction = @factions[m.channel.name]
+    faction = @channels[m.channel.name].channels[m.channel.name]
 
-    msg = "Monitoring was #{faction.monitor ? 'on' : 'off'}"
+    msg = "Monitoring was #{faction[0] ? 'on' : 'off'}"
 
     if switch == ' on'
-      faction.monitor = true
+      faction[0] = true
       m.reply(msg + ", and now it is on")
     elsif switch == ' off'
-      faction.monitor = false
+      faction[0] = false
       m.reply(msg + ", and now it is off")
     else
       m.reply(msg + ", and it is staying that way")

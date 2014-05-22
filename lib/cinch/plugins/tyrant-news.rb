@@ -81,7 +81,7 @@ module Cinch; module Plugins; class TyrantNews < TyrantPoll
     :wars
   end
 
-  def notify(channel, faction, wars)
+  def notify(faction, channels, wars)
     return if wars.nil?
     new_wars, finished_wars = wars
     finished_wars.reverse.each { |war|
@@ -94,12 +94,16 @@ module Cinch; module Plugins; class TyrantNews < TyrantPoll
       we_win = our_score > their_score || defense && our_score == their_score
 
       prefix = we_win ? 'VICTORY!!!' : 'Defeat!!!'
-      Channel(channel).send("[WAR] #{prefix} #{faction.format(war)}")
+      channels.each { |c|
+        Channel(c).send("[WAR] #{prefix} #{faction.format(war)}")
+      }
     }
     new_wars.each { |war|
       defense_war = war['defender_faction_id'].to_i == faction.faction_id
       prefix = defense_war ? 'ALARUM!!! DEFENSE WAR!!!' : 'WAR UP!!!'
-      Channel(channel).send("[WAR] #{prefix} #{faction.format(war)}")
+      channels.each { |c|
+        Channel(c).send("[WAR] #{prefix} #{faction.format(war)}")
+      }
     }
   end
 end; end; end
