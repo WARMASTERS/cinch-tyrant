@@ -1,20 +1,14 @@
 require 'cinch'
+require 'cinch/plugins/tyrant-poll'
 require 'cinch/tyrant/cmd'
 require 'set'
 require 'tyrant/faction'
 require 'tyrant/war'
 
-module Cinch; module Plugins; class TyrantNews
+module Cinch; module Plugins; class TyrantNews < TyrantPoll
   include Cinch::Plugin
 
-  # Give me time to login: Allow up to this many tries before reinit.
-  RETRIES = 1
-
-  POLL_INTERVAL = 60
-
-  DEFAULT_SETTINGS = [true, 1]
-
-  timer POLL_INTERVAL, method: :check_news
+  timer 60, method: :check_all
 
   match(/news(.*)/i)
 
@@ -26,15 +20,11 @@ module Cinch; module Plugins; class TyrantNews
     ),
   ]
 
-  class MonitoredFaction
+  class MonitoredFaction < TyrantPoll::MonitoredFaction
     attr_accessor :monitor
 
-    def initialize(user, monitor, multiplier)
-      @tyrant = Tyrants.get(user)
-      @monitor = monitor
-      @count = 0
-      @fail_count = 0
-      @multiplier = multiplier
+    def initialize(*args)
+      super
       @acked_wars = Set.new
       @pending_finished_wars = Set.new
 
@@ -42,24 +32,12 @@ module Cinch; module Plugins; class TyrantNews
       wars.each { |id, _| @acked_wars.add(id) }
     end
 
+    def poll_name; 'getActiveFactionWars'; end
+    def poll_params; ''; end
+
     # Returns [[json of new wars], [json of finished wars]]
-    def check
-      return [[], []] if not @monitor
-      @count += 1
-      return [[], []] if @count % @multiplier != 0
-
+    def poll_result(json)
       current_wars = Set.new
-
-      reinit = @fail_count > RETRIES
-      json = @tyrant.make_request('getActiveFactionWars', reinit: reinit)
-      if json['duplicate_client'] == 1
-        # Decrement count so next time @count % @multiplier == 0 still
-        @count -= 1
-        @fail_count += 1
-        return [[], []]
-      else
-        @fail_count = 0
-      end
 
       wars = json['wars']
       wars.each { |id, _| current_wars.add(id) }
@@ -90,76 +68,38 @@ module Cinch; module Plugins; class TyrantNews
       [new_wars, finished_wars]
     end
 
-    def faction_id
-      @tyrant.faction_id
-    end
-
     def format(war)
       @tyrant.format_wars([war])
     end
-
-    def pending_wars
-      @pending_finished_wars.size
-    end
   end
 
+  def monitored_faction
+    MonitoredFaction
+  end
 
-  def initialize(*args)
-    super
-    @factions = {}
+  def notification_type
+    :wars
+  end
 
-    channel_configs = config[:channels] || {}
+  def notify(channel, faction, wars)
+    return if wars.nil?
+    new_wars, finished_wars = wars
+    finished_wars.reverse.each { |war|
+      # Since we're using getFactionWarInfo, we don't get 'victory' anymore :(
+      defense = war['defender_faction_id'].to_i == faction.faction_id
+      our_score = defense ? war['defender_points'] : war['attacker_points']
+      our_score = our_score.to_i
+      their_score = defense ? war['attacker_points'] : war['defender_points']
+      their_score = their_score.to_i
+      we_win = our_score > their_score || defense && our_score == their_score
 
-    BOT_FACTIONS.each { |faction|
-      next if faction.id < 0 || faction.player.nil?
-      channel = faction.channel_for(:wars)
-      args = channel_configs[channel] || DEFAULT_SETTINGS
-      @factions[channel] = MonitoredFaction.new(faction.player, *args)
+      prefix = we_win ? 'VICTORY!!!' : 'Defeat!!!'
+      Channel(channel).send("[WAR] #{prefix} #{faction.format(war)}")
     }
-  end
-
-  def check_news
-    @factions.each { |channel, faction|
-      new_wars, finished_wars = faction.check
-      finished_wars.reverse.each { |war|
-        # Since we're using getFactionWarInfo, we don't get 'victory' anymore :(
-        defense = war['defender_faction_id'].to_i == faction.faction_id
-        our_score = defense ? war['defender_points'] : war['attacker_points']
-        our_score = our_score.to_i
-        their_score = defense ? war['attacker_points'] : war['defender_points']
-        their_score = their_score.to_i
-        we_win = our_score > their_score || defense && our_score == their_score
-
-        prefix = we_win ? 'VICTORY!!!' : 'Defeat!!!'
-        Channel(channel).send("[WAR] #{prefix} #{faction.format(war)}")
-      }
-      new_wars.each { |war|
-        defense_war = war['defender_faction_id'].to_i == faction.faction_id
-        prefix = defense_war ? 'ALARUM!!! DEFENSE WAR!!!' : 'WAR UP!!!'
-        Channel(channel).send("[WAR] #{prefix} #{faction.format(war)}")
-      }
+    new_wars.each { |war|
+      defense_war = war['defender_faction_id'].to_i == faction.faction_id
+      prefix = defense_war ? 'ALARUM!!! DEFENSE WAR!!!' : 'WAR UP!!!'
+      Channel(channel).send("[WAR] #{prefix} #{faction.format(war)}")
     }
-  end
-
-  def execute(m, switch)
-    user_good = is_officer?(m)
-    channel_good = @factions.keys.include?(m.channel.name)
-    return unless user_good && channel_good
-
-    faction = @factions[m.channel.name]
-
-    msg = "Monitoring was #{faction.monitor ? 'on' : 'off'}"
-
-    if switch == ' on'
-      faction.monitor = true
-      m.reply(msg + ", and now it is on")
-    elsif switch == ' off'
-      faction.monitor = false
-      m.reply(msg + ", and now it is off")
-    elsif switch == ' debug' && m.user.master?
-      m.reply(msg + ", and this faction has #{faction.pending_wars} pending wars")
-    else
-      m.reply(msg + ", and it is staying that way")
-    end
   end
 end; end; end
