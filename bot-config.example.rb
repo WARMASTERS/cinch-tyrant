@@ -44,11 +44,16 @@ BOT_FACTIONS = [
     # channel_map: Optional. By default, all notifications (:conquest,
     # :faction_chat, :wars) are sent to the faction's main channel. If a
     # certain type of notification should be sent to a different channel
-    # instead, this Hash[:notification_type => channel_name] allows this.
-    # In this eample, the Hole's faction chat and war notifications would go to
-    # #hole, but the conquest notifications would go to #holecq.
+    # instead, this Hash[:notification_type => channel_name_or_array] allows
+    # this.
+    # Faction chat and war notifications support an array of channel names.
+    # Conquest notifications currently only support a single channel name.
+    # In this example, the Hole's faction chat notifications would go to #hole,
+    # the conquest notifications would go to #holecq,
+    # and war notifications would go to both.
     channel_map: {
       :conquest => '#holecq',
+      :war => ['#hole', '#holecq'],
     },
   ),
 ]
