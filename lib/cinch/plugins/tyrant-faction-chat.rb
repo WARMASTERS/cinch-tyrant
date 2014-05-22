@@ -1,14 +1,10 @@
 require 'cinch'
+require 'cinch/plugins/tyrant-poll'
 require 'cinch/tyrant/cmd'
 require 'tyrant/faction'
 
-module Cinch; module Plugins; class TyrantFactionChat
+module Cinch; module Plugins; class TyrantFactionChat < TyrantPoll
   include Cinch::Plugin
-
-  # Give me time to login: Allow up to this many tries before reinit.
-  RETRIES = 1
-
-  DEFAULT_SETTINGS = [true, 1]
 
   timer 60, method: :check_all
 
@@ -22,74 +18,43 @@ module Cinch; module Plugins; class TyrantFactionChat
     ),
   ]
 
-  class MonitoredFaction
-    attr_accessor :monitor
+  class MonitoredFaction < TyrantPoll::MonitoredFaction
     attr_reader :last
-    attr_reader :user
 
-    def initialize(user, monitor, multiplier)
-      @user = user
-      @tyrant = Tyrants.get(user)
+    def initialize(*args)
+      super
       messages = @tyrant.get_faction_chat
       @last = messages[-1] ? messages[-1]['post_id'] : nil
-      @monitor = monitor
-      @multiplier = multiplier
-      @count = 1
-      @fail_count = 0
     end
 
-    def faction_id
-      @tyrant.faction_id
-    end
+    def poll_name; @last ? 'getNewFactionMessages' : 'getFactionMessages'; end
+    def poll_params; @last ? "last_post=#{@last}" : ''; end
 
-    def check
-      return if not @monitor
-      @count += 1
-      return if @count % @multiplier != 0
-
-      if @last
-        p = "last_post=#{@last}"
-
-        reinit = @fail_count > RETRIES
-        json = @tyrant.make_request('getNewFactionMessages', p, reinit: reinit)
-
-        if json['duplicate_client'] == 1
-          # Decrement count so next time @count % @multiplier == 0 still
-          @count -= 1
-          @fail_count += 1
-          return
-        else
-          @fail_count = 0
-        end
-
-        new_messages = json['messages']
-      else
-        new_messages = @tyrant.get_faction_chat
-      end
+    def poll_result(json)
+      new_messages = json['messages']
       @last = new_messages[-1]['post_id'] unless new_messages.empty?
       new_messages
     end
   end
 
+  def monitored_faction
+    MonitoredFaction
+  end
+
   def initialize(*args)
     super
-    @factions = {}
     shared[:last_faction_chat] = Hash.new
 
-    channel_configs = config[:channels] || {}
-
-    BOT_FACTIONS.each { |faction|
-      next if faction.id < 0 || faction.player.nil?
-      channel = faction.channel_for(:faction_chat)
-      args = channel_configs[channel] || DEFAULT_SETTINGS
-      @factions[channel] = MonitoredFaction.new(faction.player, *args)
-      shared[:last_faction_chat][faction.id] = @factions[channel].last
+    @factions.each { |_, f|
+      shared[:last_faction_chat][f.faction_id] = f.last
     }
   end
 
+  def notification_type
+    :faction_chat
+  end
 
-  def check_chat(channel, faction)
-    new_messages = faction.check
+  def notify(channel, faction, new_messages)
     return if new_messages.nil?
     registration_regex = /^#{bot.nick}\s+confirm\s+(\w+)\s+(\w+)$/i
 
@@ -101,8 +66,7 @@ module Cinch; module Plugins; class TyrantFactionChat
 
       if (match = registration_regex.match(m['message']))
         # TODO: Have this update the cache?
-        tyrant = Tyrants.get(faction.user)
-        members = tyrant.get_faction_members
+        members = faction.tyrant.get_faction_members
         member = members[m['user_id'].to_s]
         # Not found? Cache probably stale. Assume member.
         perm = member ? member['permission_level'].to_i : 1
@@ -116,31 +80,5 @@ module Cinch; module Plugins; class TyrantFactionChat
       end
     }
     shared[:last_faction_chat][faction.faction_id] = faction.last
-  end
-
-  def check_all
-    @factions.each { |channel, faction|
-      check_chat(channel, faction)
-    }
-  end
-
-  def execute(m, switch)
-    user_good = is_officer?(m)
-    channel_good = @factions.keys.include?(m.channel.name)
-    return unless user_good && channel_good
-
-    faction = @factions[m.channel.name]
-
-    msg = "Monitoring was #{faction.monitor ? 'on' : 'off'}"
-
-    if switch == ' on'
-      faction.monitor = true
-      m.reply(msg + ", and now it is on")
-    elsif switch == ' off'
-      faction.monitor = false
-      m.reply(msg + ", and now it is off")
-    else
-      m.reply(msg + ", and it is staying that way")
-    end
   end
 end; end; end
