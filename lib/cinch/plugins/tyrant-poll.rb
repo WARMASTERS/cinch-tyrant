@@ -38,7 +38,7 @@ module Cinch; module Plugins; class TyrantPoll
         # Decrement count so next time @count % @multiplier == 0 still
         @count -= 1
         @fail_count += 1
-        return
+        return [[], nil]
       else
         @fail_count = 0
       end
