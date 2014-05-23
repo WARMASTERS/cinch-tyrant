@@ -43,7 +43,9 @@ module Cinch; module Plugins; class TyrantPoll
         @fail_count = 0
       end
 
-      [channels_who_care, poll_result(json)]
+      # Notify all channels, regardless of who caused the poll.
+      # Otherwise, some channels miss messages.
+      [@channels.keys, poll_result(json)]
     end
   end
 
