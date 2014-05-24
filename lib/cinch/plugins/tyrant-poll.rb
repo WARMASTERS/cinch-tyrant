@@ -75,7 +75,7 @@ module Cinch; module Plugins; class TyrantPoll
   end
 
   def check_all
-    @factions.each { |channel, faction|
+    @factions.each { |_, faction|
       channels_who_care, data = faction.check
       next if channels_who_care.empty?
       notify(faction, channels_who_care, data)
