@@ -472,7 +472,8 @@ module Cinch; module Plugins; class TyrantConquestCommands
     if verbose
       slots = faction.invasion_info
       decks = knowns.map { |id|
-        "#{id}: #{slots[id].deck} | #{hash_slot(slots[id])}"
+        owner = slots[id].owner || 'unknown'
+        "#{id}: #{owner}: #{slots[id].deck} | #{hash_slot(slots[id])}"
       }.join("\n")
       m.reply('PMing you known decks ' + knowns_str, true)
       m.user.msg(decks)
