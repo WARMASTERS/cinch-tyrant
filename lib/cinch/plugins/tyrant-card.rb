@@ -132,8 +132,7 @@ module Cinch; module Plugins; class TyrantCard
     if !card_list.include?(',')
       deck, invalid = ::Tyrant::Cards::unhash(card_list.strip)
       if invalid.empty?
-        all_valid = true
-        deck.each { |id, _| all_valid &&= @cards_by_id.has_key?(id) }
+        all_valid = deck.all? { |id, _| @cards_by_id.has_key?(id) }
         return unhash(m, card_list) if all_valid
       end
     end
