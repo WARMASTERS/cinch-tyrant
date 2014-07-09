@@ -15,11 +15,11 @@ module Cinch; module Plugins; class TyrantCard
 
   KNOWN_REGEX = /(.*) \d+\/\d+ known/
 
-  match(/card (-l )?(.+)/i, method: :card)
-  match(/h(?:ash)? (.+)/i, method: :hash)
-  match(/c hash (\d+)/i, method: :chash)
-  match(/unhash (.+)/i, method: :unhash)
-  match(/dehash (.+)/i, method: :unhash)
+  match(/card\s+(-l\s+)?(.+)/i, method: :card)
+  match(/h(?:ash)?\s+(.+)/i, method: :hash)
+  match(/c hash\s+(\d+)/i, method: :chash)
+  match(/unhash\s+(.+)/i, method: :unhash)
+  match(/dehash\s+(.+)/i, method: :unhash)
   match(/recard/i, method: :recard)
 
   COMMANDS = [
