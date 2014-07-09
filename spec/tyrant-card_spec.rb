@@ -95,6 +95,12 @@ describe Cinch::Plugins::TyrantCard do
     it_behaves_like 'a command that converts hash to names'
   end
 
+  describe '!unhash with leading spaces in hash' do
+    let(:message) { make_message(bot, '!unhash  ACAB', channel: '#test') }
+
+    it_behaves_like 'a command that converts hash to names'
+  end
+
   describe '!dehash' do
     let(:message) { make_message(bot, '!dehash ACAB', channel: '#test') }
 

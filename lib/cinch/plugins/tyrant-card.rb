@@ -130,7 +130,7 @@ module Cinch; module Plugins; class TyrantCard
     return unless is_friend?(m)
 
     if !card_list.include?(',')
-      deck, invalid = ::Tyrant::Cards::unhash(card_list)
+      deck, invalid = ::Tyrant::Cards::unhash(card_list.strip)
       if invalid.empty?
         all_valid = true
         deck.each { |id, _| all_valid &&= @cards_by_id.has_key?(id) }
@@ -221,6 +221,8 @@ module Cinch; module Plugins; class TyrantCard
 
   def unhash(m, hash)
     return unless is_friend?(m)
+
+    hash.strip!
 
     if hash.size > MAX_HASH
       m.reply('That\'s too long; it can\'t possibly be a hash!', true)
