@@ -7,13 +7,14 @@ require 'yaml'
 module Cinch; module Tyrant; class Auth
   class Faction
     attr_reader :nicks
-    attr_reader :known_ids
 
     def initialize
       # nick => User
       @nicks = {}
-      # Set[user_id]
-      @known_ids = Set.new
+    end
+
+    def known_ids
+      Set.new(@nicks.values.map(&:user_id))
     end
   end
 
@@ -101,7 +102,6 @@ module Cinch; module Tyrant; class Auth
 
   def self.add_user(faction_id, user_id, nick, level)
     PENDING.delete(user_id)
-    FACTIONS[faction_id].known_ids.add(user_id)
     FACTIONS[faction_id].nicks[nick] = User.new(user_id, level)
     save
   end
