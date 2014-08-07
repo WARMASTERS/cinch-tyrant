@@ -394,9 +394,10 @@ module Cinch; module Plugins; class TyrantConquestCommands
         ood = ''
       end
 
+      ai_tile = faction.opponent.nil?
       m.reply("Owner: #{slot_info.owner || 'unknown'} | " +
               "Deck: #{ood}#{slot_info.deck || 'unknown'} | " +
-              "Hash: #{hash_slot(slot_info)}")
+              "Hash: #{ai_tile ? hash_ai(slot_info) : hash_slot(slot_info) }")
       m.reply("Deck set by #{safename}: #{set_time}. " +
               "Deck last changed commanders: #{change_time}")
     else
@@ -473,7 +474,9 @@ module Cinch; module Plugins; class TyrantConquestCommands
       slots = faction.invasion_info
       decks = knowns.map { |id|
         owner = slots[id].owner || 'unknown'
-        "#{id}: #{owner}: #{slots[id].deck} | #{hash_slot(slots[id])}"
+        ai_tile = faction.opponent.nil?
+        hash = ai_tile ? hash_ai(slots[id]) : hash_slot(slots[id])
+        "#{id}: #{owner}: #{slots[id].deck} | #{hash}"
       }.join("\n")
       m.reply('PMing you known decks ' + knowns_str, true)
       m.user.msg(decks)
@@ -537,6 +540,11 @@ module Cinch; module Plugins; class TyrantConquestCommands
     return [card, []] if card
 
     raise "No card named '#{name}'"
+  end
+
+  def hash_ai(slot)
+    return slot[:hash] if slot[:original_format] == :hash
+    return "TODO hash(#{slot[:deck]})"
   end
 
   def hash_slot(slot)
