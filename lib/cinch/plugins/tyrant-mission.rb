@@ -70,6 +70,7 @@ module Cinch; module Plugins; class TyrantMission
 
     candidates = nil
     errors = []
+    required_freqs = Hash.new(0)
     cards.split(',').each { |c|
       begin
         card, _ = resolve_card(c)
@@ -80,10 +81,12 @@ module Cinch; module Plugins; class TyrantMission
             candidates = @missions.select { |ms| ms.commander == card.id }
           end
         else
+          required_freqs[card.id] += 1
+          required = required_freqs[card.id]
           if candidates
-            candidates.select! { |ms| ms.cards.include?(card.id) }
+            candidates.select! { |ms| ms.cards[card.id] >= required }
           else
-            candidates = @missions.select { |ms| ms.cards.include?(card.id) }
+            candidates = @missions.select { |ms| ms.cards[card.id] >= required }
           end
         end
       rescue => e

@@ -54,7 +54,7 @@ describe Cinch::Plugins::TyrantMission do
       missions = [
         m.new('Mission 1', 1001, {999 => 1, 1 => 1}),
         m.new('Mission 2', 1002, {999 => 1, 2 => 1}),
-        m.new('Mission 3', 1003, {999 => 1, 3 => 1}),
+        m.new('Mission 3', 1003, {999 => 2, 3 => 1}),
       ]
       missions.each { |m| m.cards.default = 0 }
       Cinch::Plugins::TyrantMission.stub(:parse_missions).and_return(missions)
@@ -80,6 +80,11 @@ describe Cinch::Plugins::TyrantMission do
     it 'filters by commander' do
       message = make_message(bot, '!mission [1001]')
       expect(get_replies_text(message)).to be == ['1 matches: Mission 1']
+    end
+
+    it 'filters by comma-separated multiples' do
+      message = make_message(bot, '!mission [999], [999]')
+      expect(get_replies_text(message)).to be == ['1 matches: Mission 3']
     end
 
     it 'complains if there are too many' do
