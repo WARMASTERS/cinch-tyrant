@@ -30,9 +30,9 @@ module Cinch; module Plugins; class TyrantMission
       raise 'too many decks' if deck.count > 1
       deck = deck.first
 
-      cards = []
+      cards = Hash.new(0)
 
-      deck.xpath('card').each { |c| cards << c.content.to_i }
+      deck.xpath('card').each { |c| cards[c.content.to_i] += 1 }
       missions << Mission.new(name, commander, cards)
     }
     missions

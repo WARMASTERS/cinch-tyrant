@@ -41,7 +41,7 @@ describe Cinch::Plugins::TyrantMission do
       m = missions.first
       expect(m.name).to be == 'My mission'
       expect(m.commander).to be == 1001
-      expect(m.cards).to be == [1, 2]
+      expect(m.cards).to be == { 1 => 1, 2 => 1 }
     end
   end
 
@@ -51,11 +51,13 @@ describe Cinch::Plugins::TyrantMission do
 
     before :each do
       m = Cinch::Plugins::TyrantMission::Mission
-      Cinch::Plugins::TyrantMission.stub(:parse_missions).and_return([
-        m.new('Mission 1', 1001, [999, 1]),
-        m.new('Mission 2', 1002, [999, 2]),
-        m.new('Mission 3', 1003, [999, 3]),
-      ])
+      missions = [
+        m.new('Mission 1', 1001, {999 => 1, 1 => 1}),
+        m.new('Mission 2', 1002, {999 => 1, 2 => 1}),
+        m.new('Mission 3', 1003, {999 => 1, 3 => 1}),
+      ]
+      missions.each { |m| m.cards.default = 0 }
+      Cinch::Plugins::TyrantMission.stub(:parse_missions).and_return(missions)
       bot.plugins[0].stub(:shared).and_return({
         :cards_by_id => {
           1 => card1,
