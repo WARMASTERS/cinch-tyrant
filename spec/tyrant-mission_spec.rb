@@ -87,6 +87,11 @@ describe Cinch::Plugins::TyrantMission do
       expect(get_replies_text(message)).to be == ['1 matches: Mission 3']
     end
 
+    it 'filters by #-separated multiples' do
+      message = make_message(bot, '!mission [999] #2')
+      expect(get_replies_text(message)).to be == ['1 matches: Mission 3']
+    end
+
     it 'complains if there are too many' do
       message = make_message(bot, '!mission [999]')
       expect(get_replies_text(message)).to be == [
