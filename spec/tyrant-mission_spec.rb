@@ -72,6 +72,11 @@ describe Cinch::Plugins::TyrantMission do
       expect(get_replies_text(message)).to be == ['1 matches: Mission 1']
     end
 
+    it 'filters by cards with bare ID' do
+      message = make_message(bot, '!mission 1')
+      expect(get_replies_text(message)).to be == ['1 matches: Mission 1']
+    end
+
     it 'filters by commander' do
       message = make_message(bot, '!mission [1001]')
       expect(get_replies_text(message)).to be == ['1 matches: Mission 1']
