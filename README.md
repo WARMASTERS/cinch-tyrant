@@ -9,7 +9,7 @@ Synapse Games.
 ## Dependencies
 
   * [Cinch](https://github.com/cinchrb/cinch) (IRC framework)
-  * tyrant (Communication with Tyrant servers)
+  * [tyrant](https://github.com/WARMASTERS/tyrant) (Communication with Tyrant servers)
 
 ## Testing Dependencies
 
