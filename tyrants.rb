@@ -1,4 +1,3 @@
-require 'tyrant/connection'
 require 'tyrant/player'
 
 require_relative './settings'
