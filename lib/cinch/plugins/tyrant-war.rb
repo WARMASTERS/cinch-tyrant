@@ -116,10 +116,10 @@ module Cinch; module Plugins; class TyrantWar
     # If war has ended, fetch the data and cache to disk.
     # If war has not ended, cache in memory for 15 seconds.
     if @known_ended_wars[suffix] >= war_id.to_i
-      json = tyrant.war_rankings(war_id, true, :both)
+      json = tyrant.war_rankings(war_id, :both, cache: true)
     else
       json, _ = @stats_cache.lookup(war_id, 15, tolerate_exceptions: true) {
-        tyrant.war_rankings(war_id, false, :both)
+        tyrant.war_rankings(war_id, :both, cache: false)
       }
     end
 
