@@ -134,7 +134,7 @@ module Cinch; module Plugins; class TyrantRaids
 
     json['public_raids'].each { |x|
       # Convert raid to same format as getRaidInfo
-      x['end_time'] = x['start_time'].to_i + raid.time
+      x['end_time'] = x['start_time'].to_i + raid.seconds
       x['raid_members'] = Array.new(x['num_members'].to_i)
       m.reply(x['user_raid_id'] + ' ' + ::Tyrant.format_raid(@raids, x))
     }
@@ -159,7 +159,7 @@ module Cinch; module Plugins; class TyrantRaids
     raids.select! { |raid|
       time_ago = now - raid['time'].to_i
       raid = @raids[raid['value'].to_i]
-      raid && raid.time >= time_ago
+      raid && raid.seconds >= time_ago
     }
 
     raids.each { |raid|
