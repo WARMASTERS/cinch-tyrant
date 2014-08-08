@@ -5,6 +5,7 @@ require 'set'
 require 'tyrant'
 require 'tyrant/cards'
 require 'tyrant/conquest'
+require 'tyrant/sanitize'
 
 module Cinch; module Plugins; class TyrantConquestPoll
   include Cinch::Plugin
@@ -301,8 +302,8 @@ module Cinch; module Plugins; class TyrantConquestPoll
         name ||= TyrantConquest::tile_name(t)
         prefix ||= '[CONQUEST] ' + name + ' '
 
-        current = (t['faction_name'] || '(neutral)').sanitize
-        old = (prev_t['faction_name'] || '(neutral)').sanitize
+        current = ::Tyrant::sanitize_or_default(t['faction_name'], '(neutral)')
+        old = ::Tyrant::sanitize_or_default(prev_t['faction_name'], '(neutral)')
 
         if @ctrack_enabled
           o = "#{old}[#{old_owner.to_i}]"
@@ -325,9 +326,11 @@ module Cinch; module Plugins; class TyrantConquestPoll
         name ||= TyrantConquest::tile_name(t)
         prefix ||= '[CONQUEST] ' + name + ' '
 
-        owner = (t['faction_name'] || '(neutral)').sanitize
+        owner = ::Tyrant::sanitize_or_default(t['faction_name'], '(neutral)')
         if old_attacker != 0 && old_attacker != current_owner
-          attacker = (prev_t['attacking_faction_name'] || '(noname)').sanitize
+          attacker = ::Tyrant::sanitize_or_default(
+            prev_t['attacking_faction_name'], '(nil)'
+          )
 
           if @ctrack_enabled
             o = "#{owner}[#{current_owner.to_i}]"
@@ -345,7 +348,9 @@ module Cinch; module Plugins; class TyrantConquestPoll
           end
         end
         if current_attacker != 0
-          attacker = (t['attacking_faction_name'] || '(noname)').sanitize
+          attacker = ::Tyrant::sanitize_or_default(
+            t['attacking_faction_name'], '(nil)'
+          )
 
           if @ctrack_enabled
             o = "#{owner}[#{current_owner.to_i}]"

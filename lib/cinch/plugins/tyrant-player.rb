@@ -3,6 +3,7 @@ require 'cinch/tyrant/cmd'
 require 'cinch/tyrant/simple-memory-cache'
 require 'tyrant/faction'
 require 'tyrant/player'
+require 'tyrant/sanitize'
 require 'tyrant/war-report'
 
 module Cinch; module Plugins; class TyrantPlayer
@@ -48,7 +49,7 @@ module Cinch; module Plugins; class TyrantPlayer
   # If Kong name does not match Tyrant name,
   # Player name is of the form "<Tyrant name> (AKA <Kong name>)"
   def self.player_info(json, kong_name = nil, show_ids: false)
-    name = (json['user_data']['name'] || 'null').sanitize
+    name = ::Tyrant::sanitize_or_default(json['user_data']['name'], 'null')
     extra = ''
     if kong_name && name.downcase != kong_name.downcase
       extra = " (AKA #{kong_name})"
@@ -58,7 +59,7 @@ module Cinch; module Plugins; class TyrantPlayer
 
     if json['faction_data']
       f = json['faction_data']
-      fn = f['name'].sanitize
+      fn = ::Tyrant::sanitize_string(f['name'])
       fn += '[' + f['faction_id'] + ']' if show_ids
       rank = RANKS[f['permission_level']]
       # Bleh, string too long...

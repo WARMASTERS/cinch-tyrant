@@ -2,6 +2,7 @@ require 'cinch'
 require 'cinch/plugins/tyrant-poll'
 require 'cinch/tyrant/cmd'
 require 'tyrant/faction'
+require 'tyrant/sanitize'
 
 module Cinch; module Plugins; class TyrantFactionChat < TyrantPoll
   include Cinch::Plugin
@@ -61,7 +62,8 @@ module Cinch; module Plugins; class TyrantFactionChat < TyrantPoll
     new_messages.each { |m|
       user = ::Tyrant.get_name_of_id(m['user_id'])
 
-      msg = "[FACTION] #{user}: #{m['message'] ? m['message'].sanitize : 'nil'}"
+      text = ::Tyrant::sanitize_or_default(m['message'], 'nil')
+      msg = "[FACTION] #{user}: #{text}"
       channels.each { |c| Channel(c).send(msg) }
 
       if (match = registration_regex.match(m['message']))

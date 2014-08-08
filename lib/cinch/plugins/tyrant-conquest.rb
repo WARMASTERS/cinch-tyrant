@@ -2,6 +2,7 @@ require 'cinch'
 require 'cinch/tyrant/cmd'
 require 'tyrant'
 require 'tyrant/conquest'
+require 'tyrant/sanitize'
 require 'tyrant/time'
 
 module Cinch; module Plugins; class TyrantConquest
@@ -135,8 +136,9 @@ module Cinch; module Plugins; class TyrantConquest
     m.reply(invading_str) unless invading_str.empty?
     m.reply(our_attacked_str) unless our_attacked_str.empty?
     if !our_uncontested_str.empty?
-      name = our_uncontested_tiles[0]['faction_name']
-      name = name ? name.sanitize : '(nil)'
+      name = ::Tyrant::sanitize_or_default(
+        our_uncontested_tiles[0]['faction_name'], '(nil)'
+      )
       s = verbose.nil? ? 'Use -v to list' : our_uncontested_str
       n_uc = our_uncontested_tiles.size
       m.reply("#{name}'s uncontested tiles (#{n_uc}, #{u_cr} CR): #{s}")
