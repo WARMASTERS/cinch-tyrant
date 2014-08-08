@@ -14,7 +14,7 @@ describe Cinch::Plugins::TyrantRaids do
   before :each do
     expect(Tyrant).to receive(:parse_raids).and_return([
       Tyrant::Raid.new(0, 'Raid 0 WTF', 1, 1, 1, 1),
-      Tyrant::Raid.new(1, 'The First Raid', 5, 100, 7200, 1000)
+      Tyrant::Raid.new(1, 'The First Raid', 5, 100, 2, 1000)
     ])
   end
 
