@@ -1,6 +1,7 @@
 require 'cinch'
 require 'cinch/test'
 require 'rspec/mocks'
+require 'tyrant'
 
 BOT_NICK = 'testbot'
 
@@ -102,35 +103,34 @@ BOT_IDS = {
 
 # =================== TYRANT CONNECTION ===================
 
-class Tyrants
-  def self.get_fake(name, connection)
-    Tyrant.new(
-      connection: connection,
-      platform: 'faketype',
-      tyrant_version: 'fakeversion',
-      user_agent: 'fakeagent',
-      name: name,
-      user_id: 1,
-      flash_code: 'flashcode',
-      auth_token: 'authtoken',
-      faction_id: 1000,
-      faction_name: 'faction 1000',
-      client_code_dir: '/dev/null'
-    )
+class FakeTyrant < Tyrant
+  def initialize(name, conn)
+    @name = name
+    @connection = conn
+  end
+
+  def faction_id; return 1000; end
+  def faction_name; return 'faction 1000'; end
+
+  def make_request(message, params = '', reinit: false)
+    req(message, params)
+  end
+  def make_cached_request(cache_path, message, params = '', reinit: false)
+    req(message, params)
+  end
+
+  private
+
+  def req(message, params)
+    path = '/api.php?user_id=1&message=' + message
+    params = params && !params.empty? ? "#{params}&flashcode=x" : 'flashcode=x'
+    @connection.request(path, params, {})
   end
 end
 
-class DeflatedResponse
-  def initialize(response)
-    @response = response
-  end
-
-  def inflate
-    @response
-  end
-
-  def to_str
-    @response
+class Tyrants
+  def self.get_fake(name, connection)
+    return FakeTyrant.new(name, connection)
   end
 end
 
@@ -151,11 +151,7 @@ class FakeConnection
         # nil?!
         raise "No params specified for #{message}"
       end
-    expect(self).to receive(:request).with(regex, expected_params, anything).and_return(DeflatedResponse.new(JSON::dump(response)))
-  end
-
-  def cached_gzip_request(path, data, headers, key, delay)
-    self.request(path, data, headers)
+    expect(self).to receive(:request).with(regex, expected_params, anything).and_return(response)
   end
 
   private
