@@ -43,14 +43,16 @@ describe Cinch::Plugins::TyrantRaids do
 
     it 'looks up the user and uses that ID' do
       expect(Tyrant).to receive(:name_of_id).with('1234').and_return('someone')
-      @conn.respond('getRaidInfo', 'user_raid_id=1234', {'raid_info' => {
-        'user_raid_id' => '1234',
-        'raid_id' => '1',
-        'user_id' => '1',
-        'end_time' => Time.now.to_i + 3600,
-        'health' => '100',
-        'raid_members' => [],
-      }})
+      expect(@tyrant).to receive(:raid_info).with(1234).and_return({
+        'raid_info' => {
+          'user_raid_id' => '1234',
+          'raid_id' => '1',
+          'user_id' => '1',
+          'end_time' => Time.now.to_i + 3600,
+          'health' => '100',
+          'raid_members' => [],
+        }
+      })
       replies = get_replies_text(message)
       expect(replies.shift).to be =~
         /someone's The First Raid: 0\/5, 100\/100 \(100%\), \d\d:\d\d\/2 hours \(50%\)/

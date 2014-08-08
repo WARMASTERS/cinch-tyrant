@@ -29,7 +29,7 @@ describe Cinch::Plugins::TyrantPlayer do
     end
 
     it 'shows player not in faction' do
-      @conn.respond('getProfileData', 'target_user_id=47', {
+      expect(@tyrant).to receive(:player_info_by_id).with(47).and_return({
         'user_data' => {
           'user_id' => '47',
           'name' => 'joecool',
@@ -42,7 +42,7 @@ describe Cinch::Plugins::TyrantPlayer do
     end
 
     it 'shows player with different Tyrant name' do
-      @conn.respond('getProfileData', 'target_user_id=47', {
+      expect(@tyrant).to receive(:player_info_by_id).with(47).and_return({
         'user_data' => {
           'user_id' => '47',
           'name' => 'mycoolname',
@@ -55,7 +55,7 @@ describe Cinch::Plugins::TyrantPlayer do
     end
 
     it 'shows player with a faction' do
-      @conn.respond('getProfileData', 'target_user_id=47', {
+      expect(@tyrant).to receive(:player_info_by_id).with(47).and_return({
         'user_data' => {
           'user_id' => '47',
           'name' => 'joecool',

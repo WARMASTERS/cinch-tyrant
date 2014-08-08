@@ -39,11 +39,10 @@ describe Cinch::Plugins::TyrantFaction do
       @conn = FakeConnection.new
       @tyrant = Tyrants.get_fake('checker', @conn)
       expect(Tyrants).to receive(:get).with('checker').and_return(@tyrant)
-      @conn.respond('applyToFaction', 'faction_id=1000', make_faction({
+      expect(@tyrant).to receive(:faction_data).with(1000).and_return(make_faction({
         'faction_id' => '1000',
         'name' => 'myfaction',
       }))
-      @conn.respond('leaveFaction', '', { 'result' => true, })
     end
 
     it 'displays information of own faction' do
@@ -75,19 +74,16 @@ describe Cinch::Plugins::TyrantFaction do
     let(:faction_id) { 9001 }
 
     it 'shows faction info' do
-      @conn.respond('applyToFaction', 'faction_id=9001', make_faction)
-      @conn.respond('leaveFaction', '', { 'result' => true })
+      expect(@tyrant).to receive(:faction_data).with(9001).and_return(make_faction)
       expect(get_replies_text(message)).to be == [
         'testfaction: 4 members (50% active), Level 19, 700 FP, 1337/7331 W/L, 5 CR, 2 tiles'
       ]
     end
 
     it 'reports if faction could not be joined' do
-      @conn.respond('applyToFaction', 'faction_id=9001', {
+      expect(@tyrant).to receive(:faction_data).with(9001).and_return({
         'result' => false,
       })
-      # TODO: Hmm, maybe we could remove this leaveFaction
-      @conn.respond('leaveFaction', '', { 'result' => false })
       expect(get_replies_text(message)).to be == [
         'Failed to get info on "testfaction". This probably means they disbanded.'
       ]
@@ -97,11 +93,12 @@ describe Cinch::Plugins::TyrantFaction do
       let(:message) { make_message(bot, '!faction -c testfaction', channel: '#test') }
 
       before :each do
-        @conn.respond('applyToFaction', 'faction_id=9001', make_faction({
-          'conquest_attacks' => 4,
-          'conquest_attack_recharge' => Time.now.to_i - 3600,
-        }))
-        @conn.respond('leaveFaction', '', { 'result' => true })
+        expect(@tyrant).to receive(:faction_data).with(9001).and_return(
+          make_faction({
+            'conquest_attacks' => 4,
+            'conquest_attack_recharge' => Time.now.to_i - 3600,
+          })
+        )
       end
 
       context 'with a master' do
@@ -136,13 +133,14 @@ describe Cinch::Plugins::TyrantFaction do
       let(:faction_id) { 1000 }
 
       before :each do
-        @conn.respond('applyToFaction', 'faction_id=1000', make_faction({
-          'faction_id' => '1000',
-          'name' => 'myfaction',
-          'conquest_attacks' => 4,
-          'conquest_attack_recharge' => Time.now.to_i - 3600,
-        }))
-        @conn.respond('leaveFaction', '', { 'result' => true })
+        expect(@tyrant).to receive(:faction_data).with(1000).and_return(
+          make_faction({
+            'faction_id' => '1000',
+            'name' => 'myfaction',
+            'conquest_attacks' => 4,
+            'conquest_attack_recharge' => Time.now.to_i - 3600,
+          })
+        )
       end
 
       context 'with a master' do
