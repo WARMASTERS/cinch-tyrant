@@ -2,6 +2,7 @@ require 'cinch'
 require 'cinch/tyrant/cmd'
 require 'tyrant'
 require 'tyrant/conquest'
+require 'tyrant/time'
 
 module Cinch; module Plugins; class TyrantConquest
   include Cinch::Plugin
@@ -56,7 +57,7 @@ module Cinch; module Plugins; class TyrantConquest
 
   def self.safe_time_ago(time)
     return 'Never' if time == nil
-    format_time(Time.now.to_i - time) + ' ago'
+    ::Tyrant::Time::format_time(Time.now.to_i - time) + ' ago'
   end
 
   def self.safe_name(name)

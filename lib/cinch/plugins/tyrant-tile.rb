@@ -2,6 +2,7 @@ require 'cinch'
 require 'cinch/tyrant/cmd'
 require 'tyrant'
 require 'tyrant/conquest'
+require 'tyrant/time'
 
 require 'cinch/tyrant/simple-memory-cache'
 
@@ -141,7 +142,7 @@ module Cinch; module Plugins; class TyrantTile
       time_percent = 100.0 * time_left / length
       fmt << ' %s (%.2f%%) left.'
 
-      data << format_time(time_left)
+      data << ::Tyrant::Time::format_time(time_left)
       data << time_percent
     end
 

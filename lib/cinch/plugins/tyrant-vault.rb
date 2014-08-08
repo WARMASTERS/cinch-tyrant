@@ -1,6 +1,7 @@
 require 'cinch'
 require 'cinch/tyrant/cmd'
 require 'tyrant'
+require 'tyrant/time'
 
 module Cinch; module Plugins; class TyrantVault
   include Cinch::Plugin
@@ -13,6 +14,8 @@ module Cinch; module Plugins; class TyrantVault
       'Shows the current contents of the Tyrant "Core" vault.'
     ),
   ]
+
+  VAULT_PERIOD = 3 * ::Tyrant::Time::HOUR
 
   def initialize(*args)
     super
@@ -28,7 +31,7 @@ module Cinch; module Plugins; class TyrantVault
       m.reply('failed to update vault') unless result
     end
 
-    time_left = format_time(@vault_time - Time.now.to_i)
+    time_left = ::Tyrant::Time::format_time(@vault_time - Time.now.to_i)
     m.reply('[VAULT] ' + @vault.join(', ') + '. Available for ' + time_left)
   end
 
@@ -51,7 +54,7 @@ module Cinch; module Plugins; class TyrantVault
       card ? card.name : 'Unknown card ' + x
     }
 
-    @vault_time = json['cards_for_sale_starting'].to_i + 3 * HOUR
+    @vault_time = json['cards_for_sale_starting'].to_i + VAULT_PERIOD
 
     true
   end

@@ -1,6 +1,7 @@
 require_relative 'test-common'
 
 require 'cinch/plugins/tyrant-news'
+require 'tyrant/time'
 
 describe Cinch::Plugins::TyrantNews do
   include Cinch::Test
@@ -95,7 +96,7 @@ describe Cinch::Plugins::TyrantNews do
       @chan.messages.clear
 
       # 6 hours and 1 second pass!
-      @time += 6 * HOUR + 1
+      @time += 6 * Tyrant::Time::HOUR + 1
 
       @conn.respond('getActiveFactionWars', '', {'wars' => []})
       @war['completed'] = 1

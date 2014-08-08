@@ -2,11 +2,12 @@ require 'cinch'
 require 'cinch/tyrant/cmd'
 require 'digest/sha1'
 require 'tyrant'
+require 'tyrant/time'
 
 module Cinch; module Plugins; class TyrantStats
   include Cinch::Plugin
 
-  WAIT_TIME = 10 * MINUTE
+  WAIT_TIME = 10 * ::Tyrant::Time::MINUTE
 
   match(/stats/i, method: :stats)
 

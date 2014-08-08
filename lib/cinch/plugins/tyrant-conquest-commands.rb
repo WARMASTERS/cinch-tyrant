@@ -3,6 +3,7 @@ require 'cinch/tyrant/cmd'
 require 'tyrant'
 require 'tyrant/cards'
 require 'tyrant/conquest'
+require 'tyrant/time'
 require 'yaml'
 
 module Cinch; module Plugins; class TyrantConquestCommands
@@ -134,7 +135,7 @@ module Cinch; module Plugins; class TyrantConquestCommands
     return unless ensure_invasion(m, faction)
 
     last_check_ago = Time.now.to_i - faction.last_check
-    if last_check_ago >= MINUTE
+    if last_check_ago >= ::Tyrant::Time::MINUTE
       warning = 'WARNING!'
       m.reply(warning + ' Last check was over a minute ago! ' +
               'Run "!cnews invasion_monitor on" (ops only)')
@@ -163,7 +164,7 @@ module Cinch; module Plugins; class TyrantConquestCommands
     data = [
       alive, faction.invasion_info.size, slots_percent,
       health, total_health, hp_percent,
-      format_time(time_left), time_percent,
+      ::Tyrant::Time::format_time(time_left), time_percent,
     ]
     m.reply(fmt % data)
   end

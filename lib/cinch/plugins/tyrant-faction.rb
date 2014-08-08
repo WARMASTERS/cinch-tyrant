@@ -3,6 +3,7 @@ require 'cinch/tyrant/cmd'
 require 'cinch/tyrant/simple-memory-cache'
 require 'tyrant/factions'
 require 'tyrant/levenshtein'
+require 'tyrant/time'
 require 'yaml'
 
 module Cinch; module Plugins; class TyrantFaction
@@ -83,8 +84,8 @@ module Cinch; module Plugins; class TyrantFaction
     # Far I can tell conquest_attack_recharge is actually time of last attack
     last_attack = json['conquest_attack_recharge'].to_i
     time_since_last = Time.now.to_i - last_attack
-    next_charge = -time_since_last % (4 * HOUR)
-    "#{attacks}/6 attacks - next in #{format_time(next_charge)}"
+    next_charge = -time_since_last % (4 * ::Tyrant::Time::HOUR)
+    "#{attacks}/6 attacks - next in #{::Tyrant::Time::format_time(next_charge)}"
   end
 
   def faction(m, verbose, faction_name)
