@@ -23,7 +23,7 @@ module Cinch; module Plugins; class TyrantFactionChat < TyrantPoll
 
     def initialize(*args)
       super
-      messages = @tyrant.get_faction_chat
+      messages = @tyrant.make_request('getFactionMessages')['messages']
       @last = messages[-1] ? messages[-1]['post_id'] : nil
     end
 
