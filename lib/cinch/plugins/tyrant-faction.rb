@@ -127,7 +127,7 @@ module Cinch; module Plugins; class TyrantFaction
       tyrant.get_faction_data(faction_id)
     }
     if !json['result']
-      m.reply('Failed to get info on "' + faction_name +
+      m.reply('Failed to get info on "' + (faction_name || 'own faction') +
               '". This probably means they disbanded.')
     else
       send_faction_info(m, verbose, json)
