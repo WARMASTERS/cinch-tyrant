@@ -60,7 +60,7 @@ module Cinch; module Plugins; class TyrantFactionChat < TyrantPoll
     registration_regex = /^#{bot.nick}\s+confirm\s+(\w+)\s+(\w+)$/i
 
     new_messages.each { |m|
-      user = ::Tyrant.get_name_of_id(m['user_id'])
+      user = ::Tyrant::name_of_id(m['user_id'])
 
       text = ::Tyrant::sanitize_or_default(m['message'], 'nil')
       msg = "[FACTION] #{user}: #{text}"
@@ -68,7 +68,7 @@ module Cinch; module Plugins; class TyrantFactionChat < TyrantPoll
 
       if (match = registration_regex.match(m['message']))
         # TODO: Have this update the cache?
-        members = faction.tyrant.get_faction_members
+        members = faction.tyrant.faction_members
         member = members[m['user_id'].to_s]
         # Not found? Cache probably stale. Assume member.
         perm = member ? member['permission_level'].to_i : 1

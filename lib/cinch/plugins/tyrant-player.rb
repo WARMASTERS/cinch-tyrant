@@ -112,7 +112,7 @@ module Cinch; module Plugins; class TyrantPlayer
     if name_or_id =~ /^[0-9]+$/
       player_id = name_or_id.to_i
       json, _ = @id_cache.lookup(player_id, 1800, tolerate_exceptions: true) {
-        @tyrant.get_player(name_or_id)
+        @tyrant.player_info_by_id(name_or_id)
       }
       # A nil json['result'] is OK, so just check that it's not false.
       return [:id, json] if json['result'] != false
@@ -122,7 +122,7 @@ module Cinch; module Plugins; class TyrantPlayer
       sleep(3)
     end
 
-    player_id = ::Tyrant.get_id_of_name(name_or_id)
+    player_id = ::Tyrant::id_of_name(name_or_id)
 
     correction = false
     if player_id.nil?
@@ -134,7 +134,7 @@ module Cinch; module Plugins; class TyrantPlayer
       members, _ =
         @member_cache.lookup(faction.id, 1800, tolerate_exceptions: true) {
         h = {}
-        m = tyrant.get_faction_members
+        m = tyrant.faction_members
         m.each { |id, v| h[v['name'].downcase] = id.to_i } if m
         h
       }
@@ -159,7 +159,7 @@ module Cinch; module Plugins; class TyrantPlayer
     end
 
     json, _ = @id_cache.lookup(player_id, 1800, tolerate_exceptions: true) {
-      @tyrant.get_player(player_id)
+      @tyrant.player_info_by_id(player_id)
     }
     json && json['user_data'] ?
       [correction ? :correction : :name, json] :
@@ -182,9 +182,9 @@ module Cinch; module Plugins; class TyrantPlayer
       return
     end
 
-    player_name = ::Tyrant.get_name_of_id(player_name) if method == :id
+    player_name = ::Tyrant::name_of_id(player_name) if method == :id
     if method == :correction
-      kongname = ::Tyrant.get_name_of_id(json['user_data']['user_id'])
+      kongname = ::Tyrant::name_of_id(json['user_data']['user_id'])
       not_kongname = player_name.downcase != kongname.downcase
       not_gamename = player_name.downcase != json['user_data']['name'].downcase
       correctme = not_kongname && not_gamename
@@ -201,7 +201,7 @@ module Cinch; module Plugins; class TyrantPlayer
       return
     end
 
-    wars = tyrant.get_old_wars(days).map { |war| war['faction_war_id'] }
+    wars = tyrant.old_wars(days).map { |war| war['faction_war_id'] }
 
     player = tyrant.war_reports(wars) { |p|
       p['user_id'].to_i == json['user_data']['user_id'].to_i &&
@@ -245,9 +245,9 @@ module Cinch; module Plugins; class TyrantPlayer
       return
     end
 
-    player_name = ::Tyrant.get_name_of_id(player_name) if method == :id
+    player_name = ::Tyrant::name_of_id(player_name) if method == :id
     if method == :correction
-      kongname = ::Tyrant.get_name_of_id(json['user_data']['user_id'])
+      kongname = ::Tyrant::name_of_id(json['user_data']['user_id'])
       not_kongname = player_name.downcase != kongname.downcase
       not_gamename = player_name.downcase != json['user_data']['name'].downcase
       correctme = not_kongname && not_gamename
@@ -262,7 +262,7 @@ module Cinch; module Plugins; class TyrantPlayer
 
     return if tyrant.nil? || !is_member?(m)
 
-    wars = tyrant.get_old_wars(days)
+    wars = tyrant.old_wars(days)
     war_ids = wars.map { |war| war['faction_war_id'] }
     player = tyrant.war_reports(war_ids) { |p|
       p['user_id'].to_i == json['user_data']['user_id'].to_i

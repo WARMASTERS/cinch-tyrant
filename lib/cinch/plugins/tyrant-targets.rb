@@ -63,7 +63,7 @@ module Cinch; module Plugins; class TyrantTargets
     args = (config[:channels] || {})[channel.id] || DEFAULT_CONFIG
 
     targets, _ = @targets_cache.lookup(tyrant.faction_id, 15) {
-      tyrant.get_rivals_raw(*args)
+      tyrant.raw_rivals(*args)
     }
 
     info, _ = @our_fp_cache.lookup(tyrant.faction_id, 600) {

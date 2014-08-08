@@ -37,7 +37,7 @@ describe Cinch::Plugins::TyrantFactionChat do
       @conn.respond('getNewFactionMessages', 'last_post=60', {'messages' => [
         {'post_id' => '61', 'message' => 'm2', 'user_id' => '2'},
       ]})
-      expect(Tyrant).to receive(:get_name_of_id).with('2').and_return('usertwo')
+      expect(Tyrant).to receive(:name_of_id).with('2').and_return('usertwo')
       bot.plugins[0].get_timers[0].fire!
     end
 

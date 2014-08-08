@@ -124,7 +124,7 @@ module Cinch; module Plugins; class TyrantFaction
     end
 
     json, _ = @cache.lookup(faction_id.to_i, 600, tolerate_exceptions: true) {
-      tyrant.get_faction_data(faction_id)
+      tyrant.faction_data(faction_id)
     }
     if !json['result']
       m.reply('Failed to get info on "' + (faction_name || 'own faction') +
@@ -142,7 +142,7 @@ module Cinch; module Plugins; class TyrantFaction
     tyrant = Tyrants.get(config[:checker])
 
     json, _ = @cache.lookup(faction_id.to_i, 600, tolerate_exceptions: true) {
-      tyrant.get_faction_data(faction_id)
+      tyrant.faction_data(faction_id)
     }
     if !json['result']
       m.reply('Failed to look up "' + faction_id +
@@ -161,7 +161,7 @@ module Cinch; module Plugins; class TyrantFaction
       end
       if verbose.include?('f')
         id = json['creator_id']
-        name = ::Tyrant.get_name_of_id(json['creator_id'])
+        name = ::Tyrant::name_of_id(json['creator_id'])
         m.reply("Founder #{name}[#{id}]")
       end
       if verbose.include?('c')

@@ -26,7 +26,7 @@ describe Cinch::Plugins::TyrantRaids do
     let(:message) { make_message(bot, '!raid joe', channel: '#test') }
 
     it 'looks up the user and uses that ID' do
-      expect(Tyrant).to receive(:get_id_of_name).with('joe').and_return(93)
+      expect(Tyrant).to receive(:id_of_name).with('joe').and_return(93)
       expect(bot.plugins[0]).to receive(:raid_id).with(message, nil, 93)
       get_replies(message)
     end
@@ -42,7 +42,7 @@ describe Cinch::Plugins::TyrantRaids do
     end
 
     it 'looks up the user and uses that ID' do
-      expect(Tyrant).to receive(:get_name_of_id).with('1234').and_return('someone')
+      expect(Tyrant).to receive(:name_of_id).with('1234').and_return('someone')
       @conn.respond('getRaidInfo', 'user_raid_id=1234', {'raid_info' => {
         'user_raid_id' => '1234',
         'raid_id' => '1',
@@ -62,7 +62,7 @@ describe Cinch::Plugins::TyrantRaids do
     let(:message) { make_message(bot, '!raid -u 1234', channel: '#test') }
 
     it 'looks up the user and uses that ID' do
-      expect(Tyrant).to receive(:get_id_of_name).with('1234').and_return(431)
+      expect(Tyrant).to receive(:id_of_name).with('1234').and_return(431)
       expect(bot.plugins[0]).to receive(:raid_id).with(message, '-u ', 431)
       get_replies(message)
     end
@@ -91,7 +91,7 @@ describe Cinch::Plugins::TyrantRaids do
         'health' => '10',
         'num_members' => '2',
       }]})
-      expect(Tyrant).to receive(:get_name_of_id).with('5678').and_return('mytest')
+      expect(Tyrant).to receive(:name_of_id).with('5678').and_return('mytest')
       replies = get_replies_text(message)
       expect(replies.shift).to be =~
         /5678 mytest's The First Raid: 2\/5, 10\/100 \(10%\), \d\d:\d\d\/2 hours \(100%\)/

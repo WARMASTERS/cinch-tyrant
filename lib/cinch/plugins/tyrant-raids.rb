@@ -62,7 +62,7 @@ module Cinch; module Plugins; class TyrantRaids
     tyrant = Tyrants.get(config[:checker])
 
     json, _ = @raid_cache.lookup(raid_id, 60, tolerate_exceptions: true) {
-      tyrant.get_raid_info(raid_id.to_i)
+      tyrant.raid_info(raid_id.to_i)
     }
 
     show_key = k && k.include?('k') && m.user.master?
@@ -83,7 +83,7 @@ module Cinch; module Plugins; class TyrantRaids
   def raid_user(m, k, user)
     return unless m.channel ? is_friend?(m) : m.user.master?
 
-    id = ::Tyrant.get_id_of_name(user)
+    id = ::Tyrant.id_of_name(user)
     if id.nil?
       m.reply "#{user} not found"
       return
@@ -165,7 +165,7 @@ module Cinch; module Plugins; class TyrantRaids
     raids.each { |raid|
       raid_name = @raids[raid['value'].to_i].name
       raid_id = raid['target_faction_id']
-      poster = ::Tyrant.get_name_of_id(raid['user_id'])
+      poster = ::Tyrant::name_of_id(raid['user_id'])
       m.reply("#{raid_name} #{raid_id} posted by #{poster}")
     }
     m.reply('No raids!') if raids.empty?

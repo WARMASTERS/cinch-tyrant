@@ -69,7 +69,7 @@ module Cinch; module Tyrant; class Auth
     end
 
     # Are they actually a Kong player?
-    user_id = ::Tyrant.get_id_of_name(kong_name)
+    user_id = ::Tyrant::id_of_name(kong_name)
     return [false, 'No such player'] unless user_id
 
     if FACTIONS[faction_id].known_ids.include?(user_id)

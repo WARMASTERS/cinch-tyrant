@@ -64,7 +64,7 @@ module Cinch; module Plugins; class TyrantHistory
     end
 
     # Last 28 days, since this is time for which history is reliable.
-    orig_wars = tyrant.get_old_wars(28, use_cache)
+    orig_wars = tyrant.old_wars(28, use_cache)
     if name.nil?
       wars = orig_wars.take(count)
     else

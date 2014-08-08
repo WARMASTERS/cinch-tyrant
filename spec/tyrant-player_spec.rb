@@ -25,7 +25,7 @@ describe Cinch::Plugins::TyrantPlayer do
     let(:message) { make_message(bot, '!player joecool', channel: '#test') }
 
     before :each do
-      expect(Tyrant).to receive(:get_id_of_name).with('joecool').and_return(47)
+      expect(Tyrant).to receive(:id_of_name).with('joecool').and_return(47)
     end
 
     it 'shows player not in faction' do

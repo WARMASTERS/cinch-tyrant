@@ -54,7 +54,7 @@ module Cinch; module Plugins; class TyrantWar
 
     # TODO: Maybe allow updates to be more frequent if a war is close to ending?
     wars, e = @wars_cache.lookup(tyrant.faction_id, 15, tolerate_exceptions: true) {
-      tyrant.get_current_wars
+      tyrant.current_wars
     }
     m.reply('ERROR refreshing wars! Using last known data.') if e
     m.reply(wars.empty? ? 'No wars!' : tyrant.format_wars(wars))
@@ -70,7 +70,7 @@ module Cinch; module Plugins; class TyrantWar
     tyrant = Tyrants.get(user)
 
     wars, e = @wars_cache.lookup(tyrant.faction_id, 15, tolerate_exceptions: true) {
-      tyrant.get_current_wars
+      tyrant.current_wars
     }
     m.reply('ERROR refreshing wars! Using last known data.') if e
 
@@ -95,11 +95,11 @@ module Cinch; module Plugins; class TyrantWar
 
     # We want to cache the wars that have ended.
     # Unfortunately, getFactionWarRankings does not tell us!
-    # So, we use get_old_wars (cached) to build a set of wars that we know
+    # So, we use old_wars (cached) to build a set of wars that we know
     # have ended already.
 
     suffix = war_id[-3..-1].to_i
-    old_wars = tyrant.get_old_wars(nil)
+    old_wars = tyrant.old_wars(nil)
 
     # This war is not known to be ended. Update the known_ended_wars.
     if @known_ended_wars[suffix] < war_id.to_i
@@ -116,10 +116,10 @@ module Cinch; module Plugins; class TyrantWar
     # If war has ended, fetch the data and cache to disk.
     # If war has not ended, cache in memory for 15 seconds.
     if @known_ended_wars[suffix] >= war_id.to_i
-      json = tyrant.get_war_rankings(war_id, true, :both)
+      json = tyrant.war_rankings(war_id, true, :both)
     else
       json, _ = @stats_cache.lookup(war_id, 15, tolerate_exceptions: true) {
-        tyrant.get_war_rankings(war_id, false, :both)
+        tyrant.war_rankings(war_id, false, :both)
       }
     end
 
@@ -136,7 +136,7 @@ module Cinch; module Plugins; class TyrantWar
       if player =~ /^[0-9]+$/
         id = player
       else
-        id = ::Tyrant.get_id_of_name(player)
+        id = ::Tyrant::id_of_name(player)
       end
 
       unless id
@@ -166,7 +166,7 @@ module Cinch; module Plugins; class TyrantWar
 
     # Hacktacular since war_report doesn't work with :both, doh!
     # I only want to make one request,
-    # so I'll use get_war_rankings and Playerize manually
+    # so I'll use war_rankings and Playerize manually
     # Used to be map!. This fails with in-memory caching.
     usp = us.map { |p| x = ::Tyrant::Player.new(0, ''); x.add_war(p); x }
     themp = them.map { |p| x = ::Tyrant::Player.new(0, ''); x.add_war(p); x }
