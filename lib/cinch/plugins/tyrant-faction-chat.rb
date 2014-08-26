@@ -79,8 +79,9 @@ module Cinch; module Plugins; class TyrantFactionChat < TyrantPoll
           faction.faction_id, m['user_id'].to_i, nick, level, code
         )
         if success
+          User(nick).notice('Thank you for registering.')
           channels.each { |c|
-            Channel(c).send(nick + ': Thank you for registering.')
+            Channel(c).send("[REGISTER] #{nick} registered. Notice sent.")
           }
         end
       end
