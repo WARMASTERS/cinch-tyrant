@@ -117,7 +117,7 @@ module Cinch; module Plugins; class TyrantConquestCommands
 
   def resolve_faction(m)
     raise 'No TyrantConquest plugin' if shared[:conquest_factions].nil?
-    shared[:conquest_factions][m.channel.name]
+    shared[:conquest_factions][m.channel.name.downcase]
   end
 
   def cstatus(m, id)

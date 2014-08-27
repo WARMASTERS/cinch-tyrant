@@ -143,7 +143,7 @@ module Cinch; module Plugins; class TyrantCard
     return unless is_member?(m)
 
     raise 'No TyrantConquest plugin' if shared[:conquest_factions].nil?
-    faction = shared[:conquest_factions][m.channel.name]
+    faction = shared[:conquest_factions][m.channel.name.downcase]
 
     if !faction.invasion_info.has_key?(slot_id)
       m.reply(slot_id + ' is not a valid slot in the current invasion')

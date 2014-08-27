@@ -203,7 +203,7 @@ module Cinch; module Plugins; class TyrantConquestPoll
     end
 
     def option_enabled?(channel_name, option_sym)
-      opts = @options_by_channel[channel_name]
+      opts = @options_by_channel[channel_name.downcase]
       return nil if !opts
       return opts[option_sym]
     end
@@ -234,7 +234,9 @@ module Cinch; module Plugins; class TyrantConquestPoll
     channels = [channels] unless channels.is_a?(Array)
 
     channel_configs = config[:channels] || {}
-    configs = channels.map { |c| [c, channel_configs[c] || defaults.dup] }.to_h
+    configs = channels.map { |c|
+      [c.downcase, channel_configs[c] || defaults.dup]
+    }.to_h
     config_store.merge!(configs)
 
     monitored_faction = yield configs
@@ -276,7 +278,7 @@ module Cinch; module Plugins; class TyrantConquestPoll
         MonitoredInvasion.new(Tyrants.get(faction.player), *conf)
       }
       faction.channels.each { |chan|
-        @invasions_by_channel[chan] = @invasions_by_id[faction.id]
+        @invasions_by_channel[chan.downcase] = @invasions_by_id[faction.id]
       }
     }
 
@@ -437,7 +439,7 @@ module Cinch; module Plugins; class TyrantConquestPoll
   def news(m, hash, name, option, switch)
     return unless is_officer?(m)
 
-    opts = hash[m.channel.name]
+    opts = hash[m.channel.name.downcase]
 
     if option.downcase == 'list'
       m.reply(opts.to_s)
