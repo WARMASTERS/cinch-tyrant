@@ -68,32 +68,32 @@ describe Cinch::Plugins::TyrantMission do
     end
 
     it 'filters by cards' do
-      message = make_message(bot, '!mission [1]')
+      message = make_message(bot, '!mission [1]', channel: '#test')
       expect(get_replies_text(message)).to be == ['1 matches: Mission 1']
     end
 
     it 'filters by cards with bare ID' do
-      message = make_message(bot, '!mission 1')
+      message = make_message(bot, '!mission 1', channel: '#test')
       expect(get_replies_text(message)).to be == ['1 matches: Mission 1']
     end
 
     it 'filters by commander' do
-      message = make_message(bot, '!mission [1001]')
+      message = make_message(bot, '!mission [1001]', channel: '#test')
       expect(get_replies_text(message)).to be == ['1 matches: Mission 1']
     end
 
     it 'filters by comma-separated multiples' do
-      message = make_message(bot, '!mission [999], [999]')
+      message = make_message(bot, '!mission [999], [999]', channel: '#test')
       expect(get_replies_text(message)).to be == ['1 matches: Mission 3']
     end
 
     it 'filters by #-separated multiples' do
-      message = make_message(bot, '!mission [999] #2')
+      message = make_message(bot, '!mission [999] #2', channel: '#test')
       expect(get_replies_text(message)).to be == ['1 matches: Mission 3']
     end
 
     it 'complains if there are too many' do
-      message = make_message(bot, '!mission [999]')
+      message = make_message(bot, '!mission [999]', channel: '#test')
       expect(get_replies_text(message)).to be == [
         '3 matches: Maybe you should narrow down a bit more.'
       ]
