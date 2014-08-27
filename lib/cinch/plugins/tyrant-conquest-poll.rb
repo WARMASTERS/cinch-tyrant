@@ -455,7 +455,7 @@ module Cinch; module Plugins; class TyrantConquestPoll
         m.reply("wat? #{m.user.name} smells")
         return
       end
-      opts.keys.each { |k| opts[k] = new_state }
+      opts.keys.each { |k| opts[k] = new_state unless k == :monitor }
       return
     end
 
