@@ -24,18 +24,20 @@ module Cinch; module Plugins; class TyrantConquestPoll
     :status_feedback,
   ]
 
-  DEFAULT_SETTINGS = {
+  DEFAULTS_TILES = {
     :invasion_start => true,
     :invasion_win => true,
     :invasion_loss => true,
-    :invasion_monitor => true,
-    :invasion_switch => true,
-    :invasion_kill => true,
     :defense_start => true,
     :defense_win => true,
     :defense_loss => true,
     :map_reset => true,
+  }
 
+  DEFAULTS_INVASION = {
+    :invasion_monitor => true,
+    :invasion_switch => true,
+    :invasion_kill => true,
     :cset_feedback => true,
     :claim_feedback => true,
     :free_feedback => true,
@@ -85,8 +87,17 @@ module Cinch; module Plugins; class TyrantConquestPoll
     end
   }
 
+  class MonitoredTiles
+    attr_reader :channel, :monitor_opts
 
-  class MonitoredFaction
+    def initialize(faction_id, channel, monitor_opts)
+      @faction_id = faction_id
+      @channel = channel
+      @monitor_opts = monitor_opts
+    end
+  end
+
+  class MonitoredInvasion
     include Cinch::Helpers
 
     attr_accessor :monitor_opts
@@ -100,9 +111,8 @@ module Cinch; module Plugins; class TyrantConquestPoll
     attr_reader :slots_alive
     attr_reader :opponent
 
-    def initialize(tyrant, faction_id, channel, monitor_opts)
+    def initialize(tyrant, channel, monitor_opts)
       @tyrant = tyrant
-      @faction_id = faction_id
       @channel = channel
       @monitor_opts = monitor_opts
 
@@ -204,11 +214,22 @@ module Cinch; module Plugins; class TyrantConquestPoll
     attr_accessor :report_channel
   end
 
+  def setup(hash, sym, defaults, faction)
+    channel = faction.channel_for(sym)
+
+    channel_configs = config[:channels] || {}
+    config = channel_configs[channel] || defaults.dup
+
+    monitored_faction = yield channel, config
+    hash[faction.id] = monitored_faction
+  end
+
   def initialize(*args)
     super
-    @factions_by_id = {}
-    @all_factions = {}
-    shared[:conquest_factions] = @all_factions
+    @tiles_by_id = {}
+    @invasions_by_id = {}
+    @invasions_by_channel = {}
+    shared[:conquest_factions] = @invasions_by_channel
     @poller = Tyrants.get(config[:poller])
     @map_json = @poller.make_request('getConquestMap')
     @map_hash = {}
@@ -220,26 +241,27 @@ module Cinch; module Plugins; class TyrantConquestPoll
     self.class.cards = shared[:cards_by_id]
     self.class.report_channel = config[:report_channel]
 
-    channel_configs = config[:channels] || {}
-
     BOT_FACTIONS.each { |faction|
       next if faction.id < 0
-      channel = faction.channel_for(:conquest)
-      args = DEFAULT_SETTINGS.merge(channel_configs[channel] || {})
-      tyrant = faction.player ? Tyrants.get(faction.player) : nil
-      monitored_faction = MonitoredFaction.new(
-        tyrant, faction.id, channel, args
-      )
-      @factions_by_id[faction.id] = monitored_faction
+
+      setup(@tiles_by_id, :tiles, DEFAULTS_TILES, faction) { |*conf|
+        MonitoredTiles.new(faction.id, *conf)
+      }
+
+      next unless faction.player
+
+      setup(@invasions_by_id, :invasion, DEFAULTS_INVASION, faction) { |*conf|
+        MonitoredInvasion.new(Tyrants.get(faction.player), *conf)
+      }
       faction.channels.each { |chan|
-        @all_factions[chan] = monitored_faction
+        @invasions_by_channel[chan] = @invasions_by_id[faction.id]
       }
     }
 
     @map_hash.each { |id, t|
       current_attacker = t['attacking_faction_id'].to_i
       if current_attacker != 0
-        if f = @factions_by_id[current_attacker]
+        if f = @invasions_by_id[current_attacker]
           f.invasion_tile = id
         end
       end
@@ -253,7 +275,7 @@ module Cinch; module Plugins; class TyrantConquestPoll
   end
 
   def check_invasion
-    @factions_by_id.each_value { |faction|
+    @invasions_by_id.each_value { |faction|
       next unless faction.monitor_opts[:invasion_monitor]
       messages = faction.check_invasion
       messages.each { |m| Channel(faction.channel).send(m) }
@@ -285,7 +307,7 @@ module Cinch; module Plugins; class TyrantConquestPoll
 
     @reset_acknowledged = false
 
-    no_attack_factions = Set.new(@factions_by_id.keys)
+    no_attack_factions = Set.new(@invasions_by_id.keys)
 
     @map_json['conquest_map']['map'].each { |t|
       id = t['system_id']
@@ -314,10 +336,10 @@ module Cinch; module Plugins; class TyrantConquestPoll
           Channel(self.class.report_channel).send(message)
         end
 
-        if f = @factions_by_id[current_owner]
+        if f = @tiles_by_id[current_owner]
           send_message(f, name, 'Conquered from', old, :invasion_win)
         end
-        if f = @factions_by_id[old_owner]
+        if f = @tiles_by_id[old_owner]
           send_message(f, name, 'Lost to', current, :defense_loss)
         end
       end
@@ -341,10 +363,10 @@ module Cinch; module Plugins; class TyrantConquestPoll
             Channel(self.class.report_channel).send(message)
           end
 
-          if f = @factions_by_id[current_owner]
+          if f = @tiles_by_id[current_owner]
             send_message(f, name, 'Defended against', attacker, :defense_win)
           end
-          if f = @factions_by_id[old_attacker]
+          if f = @tiles_by_id[old_attacker]
             send_message(f, name, 'Failed invasion against', owner,
                          :invasion_loss)
           end
@@ -361,12 +383,14 @@ module Cinch; module Plugins; class TyrantConquestPoll
             Channel(self.class.report_channel).send(message)
           end
 
-          if f = @factions_by_id[current_owner]
+          if f = @tiles_by_id[current_owner]
             send_message(f, name, 'Under attack by', attacker, :defense_start)
           end
-          if f = @factions_by_id[current_attacker]
-            f.invasion_tile = id
+          if f = @tiles_by_id[current_attacker]
             send_message(f, name, 'New invasion against', owner, :invasion_start)
+          end
+          if f = @invasions_by_id[current_attacker]
+            f.invasion_tile = id
           end
         end
       end
@@ -374,13 +398,13 @@ module Cinch; module Plugins; class TyrantConquestPoll
       no_attack_factions.delete(current_attacker) if current_attacker != 0
     }
 
-    no_attack_factions.each { |x| @factions_by_id[x].invasion_tile = nil }
+    no_attack_factions.each { |x| @invasions_by_id[x].invasion_tile = nil }
   end
 
   def cnews(m, option, switch)
     return unless is_warmaster?(m)
 
-    faction = @all_factions[m.channel.name]
+    faction = @invasions_by_channel[m.channel.name]
 
     if option.downcase == 'list'
       m.reply(faction.monitor_opts.to_s)
