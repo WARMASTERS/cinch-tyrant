@@ -124,7 +124,7 @@ module Cinch; module Plugins; class TyrantConquestCommands
     return unless is_member?(m)
 
     faction = resolve_faction(m)
-    return unless faction.monitor_opts[:status_feedback]
+    return unless faction.option_enabled?(m.channel.name, :status_feedback)
     id ? slot(m, id, false) : status(m)
   end
 
@@ -324,7 +324,7 @@ module Cinch; module Plugins; class TyrantConquestCommands
     result = set_add(m, id, target, :attackers, 'attacking')
 
     faction = resolve_faction(m)
-    if result && faction.monitor_opts[:claim_feedback]
+    if result && faction.option_enabled?(m.channel.name, :claim_feedback)
       m.reply("OK, #{result} has claimed slot #{id}")
     end
   end
@@ -333,7 +333,7 @@ module Cinch; module Plugins; class TyrantConquestCommands
     result = set_delete(m, id, target, :attackers, 'attacking')
 
     faction = resolve_faction(m)
-    if result && faction.monitor_opts[:claim_feedback]
+    if result && faction.option_enabled?(m.channel.name, :claim_feedback)
       m.reply("OK, #{result} has released claim on slot #{id}")
     end
   end
@@ -344,7 +344,7 @@ module Cinch; module Plugins; class TyrantConquestCommands
     result = set_add(m, id, target, :stuck, 'stuck on')
 
     faction = resolve_faction(m)
-    if result && faction.monitor_opts[:stuck_feedback]
+    if result && faction.option_enabled?(m.channel.name, :stuck_feedback)
       m.reply("OK, #{result} is stuck on slot #{id}")
     end
   end
@@ -353,7 +353,7 @@ module Cinch; module Plugins; class TyrantConquestCommands
     result = set_delete(m, id, target, :stuck, 'stuck on')
 
     faction = resolve_faction(m)
-    if result && faction.monitor_opts[:stuck_feedback]
+    if result && faction.option_enabled?(m.channel.name, :stuck_feedback)
       m.reply("OK, #{result} is no longer stuck on slot #{id}")
     end
   end
@@ -362,7 +362,7 @@ module Cinch; module Plugins; class TyrantConquestCommands
     return unless is_member?(m)
 
     faction = resolve_faction(m)
-    return unless faction.monitor_opts[:check_feedback]
+    return unless faction.option_enabled?(m.channel.name, :check_feedback)
     slot(m, id, short)
   end
 
@@ -492,7 +492,7 @@ module Cinch; module Plugins; class TyrantConquestCommands
     faction = resolve_faction(m)
     return unless ensure_invasion(m, faction)
 
-    return unless faction.monitor_opts[:free_feedback]
+    return unless faction.option_enabled?(m.channel.name, :free_feedback)
 
     free_slots = filter_slots(faction) { |slot|
       (all || slot.hp.to_i > 0) && slot.attackers.empty?
@@ -649,7 +649,7 @@ module Cinch; module Plugins; class TyrantConquestCommands
     info.deck_set_by = setter
     info.deck_set_time = Time.now.to_i
 
-    if faction.monitor_opts[:cset_feedback]
+    if faction.option_enabled?(m.channel.name, :cset_feedback)
       if match = KNOWN_REGEX.match(deck)
         known = " (#{match[2]}/#{match[3]} known)"
       else

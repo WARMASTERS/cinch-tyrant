@@ -88,21 +88,20 @@ module Cinch; module Plugins; class TyrantConquestPoll
   }
 
   class MonitoredTiles
-    attr_reader :channel, :monitor_opts
-
-    def initialize(faction_id, channel, monitor_opts)
+    def initialize(faction_id, options_by_channel)
       @faction_id = faction_id
-      @channel = channel
-      @monitor_opts = monitor_opts
+      @options_by_channel = options_by_channel
+    end
+
+    def channels_for(sym)
+      return @options_by_channel.select { |_, v| v[sym] }.keys
     end
   end
 
   class MonitoredInvasion
     include Cinch::Helpers
 
-    attr_accessor :monitor_opts
     attr_reader :tyrant
-    attr_reader :channel
     attr_reader :invasion_tile, :invasion_info
     attr_reader :invasion_start_time, :invasion_end_time
     attr_reader :invasion_effect
@@ -111,10 +110,9 @@ module Cinch; module Plugins; class TyrantConquestPoll
     attr_reader :slots_alive
     attr_reader :opponent
 
-    def initialize(tyrant, channel, monitor_opts)
+    def initialize(tyrant, options_by_channel)
       @tyrant = tyrant
-      @channel = channel
-      @monitor_opts = monitor_opts
+      @options_by_channel = options_by_channel
 
       @invasion_tile = nil
       @new_invasion = false
@@ -142,7 +140,7 @@ module Cinch; module Plugins; class TyrantConquestPoll
 
       json = @tyrant.make_request('getConquestTileInfo',
                                   "system_id=#{@invasion_tile}", reinit: false)
-      messages = []
+      messages = Hash.new { |h, k| h[k] = [] }
 
       return [] if json['duplicate_client']
 
@@ -155,7 +153,7 @@ module Cinch; module Plugins; class TyrantConquestPoll
         unless @new_invasion
           if v['defeated'] == '1' && !@invasion_info[k][:defeated]
             # Defeated! Notify channel if requested
-            if @monitor_opts[:invasion_kill]
+            push_messages(messages, :invasion_kill) {
               c = TyrantConquestPoll::cards
               name = c[v['commander_id'].to_i % 10000].name
               name = 'Foil ' + name if v['commander_id'].to_i > 10000
@@ -164,8 +162,8 @@ module Cinch; module Plugins; class TyrantConquestPoll
                 stuck_people = @invasion_info[k].stuck.to_a.join(', ')
                 message += ' ' + stuck_people + ': you are free!'
               end
-              messages.push(message)
-            end
+              message
+            }
 
             # Since it's dead nobody is stuck or attacking anymore
             @invasion_info[k].attackers.clear
@@ -175,7 +173,7 @@ module Cinch; module Plugins; class TyrantConquestPoll
             @invasion_info[k][:change_time] = Time.now.to_i
 
             # Notify channel if requested
-            if @monitor_opts[:invasion_switch]
+            push_messages(messages, :invasion_switch) {
               c = TyrantConquestPoll::cards
               name1 = c[@invasion_info[k][:commander].to_i % 10000].name
               name1 = 'Foil ' + name1 if @invasion_info[k][:commander].to_i > 10000
@@ -187,8 +185,8 @@ module Cinch; module Plugins; class TyrantConquestPoll
                 attackers = @invasion_info[k].attackers.to_a.join(', ')
                 message += ' ' + attackers + ': be careful!'
               end
-              messages.push(message)
-            end
+              message
+            }
           end
         end
         @invasion_info[k][:commander] = v['commander_id']
@@ -205,6 +203,25 @@ module Cinch; module Plugins; class TyrantConquestPoll
       @last_check = Time.now.to_i
       messages
     end
+
+    def option_enabled?(channel_name, option_sym)
+      opts = @options_by_channel[channel_name]
+      return nil if !opts
+      return opts[option_sym]
+    end
+
+    def monitor_enabled?
+      return @options_by_channel.values.any? { |v| v[:invasion_monitor] }
+    end
+
+    private
+
+    def push_messages(messages, sym)
+      channels = @options_by_channel.select { |_, v| v[sym] }.keys
+      return if channels.empty?
+      message = yield
+      channels.each { |c| messages[c] << message }
+    end
   end
 
   @cards = {}
@@ -215,12 +232,13 @@ module Cinch; module Plugins; class TyrantConquestPoll
   end
 
   def setup(hash, sym, defaults, faction)
-    channel = faction.channel_for(sym)
+    channels = faction.channel_for(sym)
+    channels = [channels] unless channels.is_a?(Array)
 
     channel_configs = config[:channels] || {}
-    config = channel_configs[channel] || defaults.dup
+    configs = channels.map { |c| [c, channel_configs[c] || defaults.dup] }.to_h
 
-    monitored_faction = yield channel, config
+    monitored_faction = yield configs
     hash[faction.id] = monitored_faction
   end
 
@@ -269,16 +287,20 @@ module Cinch; module Plugins; class TyrantConquestPoll
   end
 
   def send_message(faction, tile, verb, enemy, enable_sym)
-    return unless faction.monitor_opts[enable_sym]
-    str = ['[CONQUEST]', tile, verb, enemy].compact.join(' ')
-    Channel(faction.channel).send(str)
+    channel_names = faction.channels_for(enable_sym)
+    channel_names.each { |cn|
+      Channel(cn).send(['[CONQUEST]', tile, verb, enemy].compact.join(' '))
+    }
   end
 
   def check_invasion
     @invasions_by_id.each_value { |faction|
-      next unless faction.monitor_opts[:invasion_monitor]
+      next unless faction.monitor_enabled?
       messages = faction.check_invasion
-      messages.each { |m| Channel(faction.channel).send(m) }
+      messages.each { |channel_name, msgs|
+        channel = Channel(channel_name)
+        msgs.each { |m| channel.send(m) }
+      }
     }
   end
 
