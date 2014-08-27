@@ -461,12 +461,13 @@ module Cinch; module Plugins; class TyrantConquestPoll
       return
     end
 
-    option_sym = option.to_sym
-
-    if !opts.has_key?(option_sym)
+    # Don't convert arbitrary input to symbols until we know it is safe.
+    unless opts.keys.map(&:to_s).include?(option)
       m.reply("#{option} is not a valid #{name} news item")
       return
     end
+
+    option_sym = option.to_sym
 
     msg = "#{option} was #{opts[option_sym] ? 'on' : 'off'}"
 
