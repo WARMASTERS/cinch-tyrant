@@ -49,17 +49,26 @@ module Cinch; module Plugins; class TyrantConquestPoll
   timer POLL_INTERVAL, method: :check_conquest
   timer INVASION_POLL_INTERVAL, method: :check_invasion
 
-  match(/cnews\s*(\S+)\s*(\S+)?/i, method: :cnews)
+  match(/tilenews\s*(\S+)\s*(\S+)?/i, method: :tilenews)
+  match(/invasionnews\s*(\S+)\s*(\S+)?/i, method: :invasionnews)
   match(/ctrack(.*)/i, method: :ctrack)
 
   COMMANDS = [
-    Cinch::Tyrant::Cmd.new('conquest', 'cnews', 'list',
+    Cinch::Tyrant::Cmd.new('conquest', 'tilenews', 'list',
       lambda { |m| is_warmaster?(m) },
       'Lists possible conquest news alert items'
     ),
-    Cinch::Tyrant::Cmd.new('conquest', 'cnews', '<item> <on|off>',
+    Cinch::Tyrant::Cmd.new('conquest', 'tilenews', '<item> <on|off>',
       lambda { |m| is_warmaster?(m) },
-      'Turns a conquest news item (from !cnews list) on or off'
+      'Turns a conquest news item (from !tilenews list) on or off'
+    ),
+    Cinch::Tyrant::Cmd.new('invasion', 'invasionnews', 'list',
+      lambda { |m| is_warmaster?(m) },
+      'Lists possible invasion news alert items'
+    ),
+    Cinch::Tyrant::Cmd.new('invasion', 'invasionnews', '<item> <on|off>',
+      lambda { |m| is_warmaster?(m) },
+      'Turns a invasion news item (from !invasionnews list) on or off'
     ),
   ]
 
@@ -429,13 +438,20 @@ module Cinch; module Plugins; class TyrantConquestPoll
     no_attack_factions.each { |x| @invasions_by_id[x].invasion_tile = nil }
   end
 
-  def cnews(m, option, switch)
+  def tilenews(m, option, switch)
+    news(m, @tiles_configs, 'tile', option, switch)
+  end
+  def invasionnews(m, option, switch)
+    news(m, @invasion_configs, 'invasion', option, switch)
+  end
+
+  def news(m, hash, name, option, switch)
     return unless is_warmaster?(m)
 
-    faction = @invasions_by_channel[m.channel.name]
+    opts = hash[m.channel.name]
 
     if option.downcase == 'list'
-      m.reply(faction.monitor_opts.to_s)
+      m.reply(opts.to_s)
       return
     end
 
@@ -450,24 +466,24 @@ module Cinch; module Plugins; class TyrantConquestPoll
         m.reply("wat? #{m.user.name} smells")
         return
       end
-      CLEM_CONFLICT.each { |s| faction.monitor_opts[s] = new_state }
+      CLEM_CONFLICT.each { |s| opts[s] = new_state }
       return
     end
 
     option_sym = option.to_sym
 
-    if !faction.monitor_opts.has_key?(option_sym)
-      m.reply("#{option} is not a valid conquest news item")
+    if !opts.has_key?(option_sym)
+      m.reply("#{option} is not a valid #{name} news item")
       return
     end
 
-    msg = "#{option} was #{faction.monitor_opts[option_sym] ? 'on' : 'off'}"
+    msg = "#{option} was #{opts[option_sym] ? 'on' : 'off'}"
 
     if switch == 'on'
-      faction.monitor_opts[option_sym] = true
+      opts[option_sym] = true
       m.reply(msg + ", and now it is on")
     elsif switch == 'off'
-      faction.monitor_opts[option_sym] = false
+      opts[option_sym] = false
       m.reply(msg + ", and now it is off")
     else
       m.reply(msg + ", and it is staying that way")
