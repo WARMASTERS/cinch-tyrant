@@ -246,8 +246,8 @@ module Cinch; module Plugins; class TyrantConquestPoll
 
   def send_message(faction, tile, verb, enemy, enable_sym)
     return unless faction.monitor_opts[enable_sym]
-    prefix = '[CONQUEST] '
-    Channel(faction.channel).send(prefix + tile + " #{verb} #{enemy}")
+    str = ['[CONQUEST]', tile, verb, enemy].compact.join(' ')
+    Channel(faction.channel).send(str)
   end
 
   def check_invasion
