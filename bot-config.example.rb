@@ -41,13 +41,16 @@ BOT_FACTIONS = [
     # If not present, this bot will only perform functions that do not require
     # faction membership.
     player: 'my_hole_member',
-    # channel_map: Optional. By default, all notifications (:conquest,
-    # :faction_chat, :wars) are sent to the faction's main channel. If a
-    # certain type of notification should be sent to a different channel
-    # instead, this Hash[:notification_type => channel_name_or_array] allows
-    # this.
-    # Faction chat and war notifications support an array of channel names.
-    # Conquest notifications currently only support a single channel name.
+    # channel_map: Optional. By default, all notifications are sent to the
+    # faction's main channel. If a certain type of notification should be sent
+    # to a different channel instead, this
+    # Hash[:notification_type => channel_name_or_array] allows this.
+    # These notification types support an array of channel names:
+    #   :wars (New and just-ended faction wars, from TyrantNews)
+    #   :faction-chat (Messages sent to faction chat, from TyrantFactionChat)
+    # These notification types support only a single channel name:
+    #   :conquest (Conquest, from TyrantConquestPoll)
+    #
     # In this example, the Hole's faction chat notifications would go to #hole,
     # the conquest notifications would go to #holecq,
     # and war notifications would go to both.
