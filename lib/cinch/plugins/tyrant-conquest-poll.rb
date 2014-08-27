@@ -24,9 +24,9 @@ module Cinch; module Plugins; class TyrantConquestPoll
   }
 
   DEFAULTS_INVASION = {
-    :invasion_monitor => true,
-    :invasion_switch => true,
-    :invasion_kill => true,
+    :monitor => true,
+    :commander_switch => true,
+    :slot_killed => true,
     :cset_feedback => true,
     :claim_feedback => true,
     :free_feedback => true,
@@ -151,7 +151,7 @@ module Cinch; module Plugins; class TyrantConquestPoll
         unless @new_invasion
           if v['defeated'] == '1' && !@invasion_info[k][:defeated]
             # Defeated! Notify channel if requested
-            push_messages(messages, :invasion_kill) {
+            push_messages(messages, :slot_killed) {
               c = TyrantConquestPoll::cards
               name = c[v['commander_id'].to_i % 10000].name
               name = 'Foil ' + name if v['commander_id'].to_i > 10000
@@ -171,7 +171,7 @@ module Cinch; module Plugins; class TyrantConquestPoll
             @invasion_info[k][:change_time] = Time.now.to_i
 
             # Notify channel if requested
-            push_messages(messages, :invasion_switch) {
+            push_messages(messages, :commander_switch) {
               c = TyrantConquestPoll::cards
               name1 = c[@invasion_info[k][:commander].to_i % 10000].name
               name1 = 'Foil ' + name1 if @invasion_info[k][:commander].to_i > 10000
@@ -209,7 +209,7 @@ module Cinch; module Plugins; class TyrantConquestPoll
     end
 
     def monitor_enabled?
-      return @options_by_channel.values.any? { |v| v[:invasion_monitor] }
+      return @options_by_channel.values.any? { |v| v[:monitor] }
     end
 
     private
