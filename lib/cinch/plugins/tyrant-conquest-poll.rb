@@ -231,15 +231,16 @@ module Cinch; module Plugins; class TyrantConquestPoll
     attr_accessor :report_channel
   end
 
-  def setup(hash, sym, defaults, faction)
+  def setup(faction_store, config_store, sym, defaults, faction)
     channels = faction.channel_for(sym)
     channels = [channels] unless channels.is_a?(Array)
 
     channel_configs = config[:channels] || {}
     configs = channels.map { |c| [c, channel_configs[c] || defaults.dup] }.to_h
+    config_store.merge!(configs)
 
     monitored_faction = yield configs
-    hash[faction.id] = monitored_faction
+    faction_store[faction.id] = monitored_faction
   end
 
   def initialize(*args)
@@ -256,19 +257,24 @@ module Cinch; module Plugins; class TyrantConquestPoll
     @ctrack_enabled = true
     @reset_acknowledged = false
 
+    @invasion_configs = {}
+    @tiles_configs = {}
+
     self.class.cards = shared[:cards_by_id]
     self.class.report_channel = config[:report_channel]
 
     BOT_FACTIONS.each { |faction|
       next if faction.id < 0
 
-      setup(@tiles_by_id, :tiles, DEFAULTS_TILES, faction) { |*conf|
+      setup(@tiles_by_id, @tiles_configs, :tiles, DEFAULTS_TILES,
+            faction) { |*conf|
         MonitoredTiles.new(faction.id, *conf)
       }
 
       next unless faction.player
 
-      setup(@invasions_by_id, :invasion, DEFAULTS_INVASION, faction) { |*conf|
+      setup(@invasions_by_id, @invasion_configs, :invasion, DEFAULTS_INVASION,
+            faction) { |*conf|
         MonitoredInvasion.new(Tyrants.get(faction.player), *conf)
       }
       faction.channels.each { |chan|
