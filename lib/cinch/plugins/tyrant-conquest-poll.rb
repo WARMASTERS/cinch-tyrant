@@ -34,6 +34,8 @@ module Cinch; module Plugins; class TyrantConquestPoll
     :defense_start => true,
     :defense_win => true,
     :defense_loss => true,
+    :map_reset => true,
+
     :cset_feedback => true,
     :claim_feedback => true,
     :free_feedback => true,
@@ -267,8 +269,8 @@ module Cinch; module Plugins; class TyrantConquestPoll
 
     if tiles_owned == 0
       if !@reset_acknowledged
-        @factions_by_id.each_value { |faction|
-          Channel(faction.channel).send("[CONQUEST] MAP RESET!!!")
+        @tiles_by_id.each_value { |faction|
+          send_message(faction, nil, 'MAP RESET!!!', nil, :map_reset)
         }
         Channel(self.class.report_channel).send("[CONQUEST] MAP RESET!!!")
       end
