@@ -48,14 +48,16 @@ BOT_FACTIONS = [
     # These notification types support an array of channel names:
     #   :wars (New and just-ended faction wars, from TyrantNews)
     #   :faction-chat (Messages sent to faction chat, from TyrantFactionChat)
+    #   :tiles (Tile attacks and defenses, from TyrantConquestPoll)
+    #   :invasion (Invasion status, from TyrantConquestPoll)
     # These notification types support only a single channel name:
-    #   :conquest (Conquest, from TyrantConquestPoll)
+    #   (none, because all notification types support multiple channels)
     #
     # In this example, the Hole's faction chat notifications would go to #hole,
-    # the conquest notifications would go to #holecq,
+    # the invasion notifications would go to #holecq,
     # and war notifications would go to both.
     channel_map: {
-      :conquest => '#holecq',
+      :invasion => '#holecq',
       :war => ['#hole', '#holecq'],
     },
   ),
