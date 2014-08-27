@@ -13,17 +13,6 @@ module Cinch; module Plugins; class TyrantConquestPoll
   POLL_INTERVAL = 60
   INVASION_POLL_INTERVAL = 15
 
-  CLEM_CONFLICT = [
-    :invasion_switch,
-    :invasion_kill,
-    :cset_feedback,
-    :claim_feedback,
-    :free_feedback,
-    :stuck_feedback,
-    :check_feedback,
-    :status_feedback,
-  ]
-
   DEFAULTS_TILES = {
     :invasion_start => true,
     :invasion_win => true,
@@ -455,18 +444,18 @@ module Cinch; module Plugins; class TyrantConquestPoll
       return
     end
 
-    if option.downcase == 'clem'
+    if option.downcase == '*'
       if switch == 'on'
         new_state = true
-        m.reply('Setting all clemmy commands on')
+        m.reply("Setting all #{name} news items on")
       elsif switch == 'off'
         new_state = false
-        m.reply('Setting all clemmy commands off')
+        m.reply("Setting all #{name} news items off")
       else
         m.reply("wat? #{m.user.name} smells")
         return
       end
-      CLEM_CONFLICT.each { |s| opts[s] = new_state }
+      opts.keys.each { |k| opts[k] = new_state }
       return
     end
 
