@@ -55,19 +55,19 @@ module Cinch; module Plugins; class TyrantConquestPoll
 
   COMMANDS = [
     Cinch::Tyrant::Cmd.new('conquest', 'tilenews', 'list',
-      lambda { |m| is_warmaster?(m) },
+      lambda { |m| is_officer?(m) },
       'Lists possible conquest news alert items'
     ),
     Cinch::Tyrant::Cmd.new('conquest', 'tilenews', '<item> <on|off>',
-      lambda { |m| is_warmaster?(m) },
+      lambda { |m| is_officer?(m) },
       'Turns a conquest news item (from !tilenews list) on or off'
     ),
     Cinch::Tyrant::Cmd.new('invasion', 'invasionnews', 'list',
-      lambda { |m| is_warmaster?(m) },
+      lambda { |m| is_officer?(m) },
       'Lists possible invasion news alert items'
     ),
     Cinch::Tyrant::Cmd.new('invasion', 'invasionnews', '<item> <on|off>',
-      lambda { |m| is_warmaster?(m) },
+      lambda { |m| is_officer?(m) },
       'Turns a invasion news item (from !invasionnews list) on or off'
     ),
   ]
@@ -446,7 +446,7 @@ module Cinch; module Plugins; class TyrantConquestPoll
   end
 
   def news(m, hash, name, option, switch)
-    return unless is_warmaster?(m)
+    return unless is_officer?(m)
 
     opts = hash[m.channel.name]
 
