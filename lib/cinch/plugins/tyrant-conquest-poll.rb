@@ -235,7 +235,12 @@ module Cinch; module Plugins; class TyrantConquestPoll
 
     channel_configs = config[:channels] || {}
     configs = channels.map { |c|
-      [c.downcase, channel_configs[c] || defaults.dup]
+      channel_config = channel_configs[c] || {}
+      # Explicit configs override the defaults, but only if they are valid.
+      values = channel_config.values_at(*defaults.keys)
+      kv_pairs = defaults.keys.zip(values).select { |_, v| !v.nil? }
+      config = defaults.merge(kv_pairs.to_h)
+      [c.downcase, config]
     }.to_h
     config_store.merge!(configs)
 
