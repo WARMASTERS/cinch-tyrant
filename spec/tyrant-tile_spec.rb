@@ -19,6 +19,7 @@ describe Cinch::Plugins::TyrantTile do
       make_tile(1, 1000, x: 1, y: 2),
       make_tile(2, 1001, x: 3, y: 4),
       make_tile(3, 1002, x: 5, y: 6),
+      make_tile(9000, x: 0, y: 0),
     ]}})
   end
 
@@ -33,6 +34,15 @@ describe Cinch::Plugins::TyrantTile do
 
     it 'looks up the tile and uses its ID' do
       expect(bot.plugins[0]).to receive(:tile).with(message, nil, 1)
+      get_replies(message)
+    end
+  end
+
+  describe '!tile 00' do
+    let(:message) { make_message(bot, '!tile 00', channel: '#test') }
+
+    it 'looks up the central tile and uses its ID' do
+      expect(bot.plugins[0]).to receive(:tile).with(message, nil, 9000)
       get_replies(message)
     end
   end
