@@ -92,6 +92,16 @@ describe Cinch::Plugins::TyrantMission do
       expect(get_replies_text(message)).to be == ['1 matches: Mission 1']
     end
 
+    it 'filters by commander + card' do
+      message = make_message(bot, '!mission [1001], [999]', channel: '#test')
+      expect(get_replies_text(message)).to be == ['1 matches: Mission 1']
+    end
+
+    it 'filters by card + commander' do
+      message = make_message(bot, '!mission [999], [1001]', channel: '#test')
+      expect(get_replies_text(message)).to be == ['1 matches: Mission 1']
+    end
+
     it 'filters by comma-separated multiples' do
       message = make_message(bot, '!mission [999], [999]', channel: '#test')
       expect(get_replies_text(message)).to be == ['1 matches: Mission 3']
