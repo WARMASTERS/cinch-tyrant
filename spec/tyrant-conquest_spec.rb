@@ -84,5 +84,16 @@ describe Cinch::Plugins::TyrantConquest do
         'faction 1001\'s uncontested tiles (1, 2 CR): Use -v to list'
       ]
     end
+
+    it 'complains if no faction with that name exists' do
+      bot.plugins[0].stub(:map_hash).and_return({
+        '1' => make_tile(1, 1000, cr: 2),
+        '2' => make_tile(2),
+      })
+      replies = get_replies_text(message)
+      expect(replies).to be == [
+        'Faction faction 1001 is not on the map'
+      ]
+    end
   end
 end
