@@ -126,5 +126,17 @@ describe Cinch::Plugins::TyrantTile do
         ]
       end
     end
+
+    describe 'on a tile that does not exist' do
+      let(:message) { make_message(bot, '!tile 9001', channel: '#test') }
+
+      it 'informs the user' do
+        bot.plugins[0].stub(:shared).and_return({:conquest_map_hash => {
+          '1' => make_tile(1, 1000, x: 1, y: 2),
+        }})
+        expect(get_replies_text(message)).to be == ['Tile 9001 does not exist']
+      end
+    end
+
   end
 end
