@@ -298,5 +298,84 @@ describe Cinch::Plugins::TyrantConquestPoll do
     end
   end
 
+  describe 'when a faction immediately attacks after a map reset' do
+    before :each do
+      # map is set in top-level before :each, and plugin ctor has been run.
+
+      # And suddenly, the map has no owners! Fire timer again.
+      @conn.respond('getConquestMap', '', {'conquest_map' => {'map' => [
+        make_tile(1, nil, 1000),
+        make_tile(2),
+      ]}})
+      bot.plugins[0].get_timers[0].fire!
+    end
+
+    it 'notifies faction channel of the map reset' do
+      expect(@chans[my_channel].messages).to include('[CONQUEST] MAP RESET!!!')
+    end
+    it 'notifies faction channel of the map reset' do
+      expect(@chans[my_channel].messages).to include(
+        '[CONQUEST]    1 (  0,   0) New invasion against (neutral)'
+      )
+    end
+    it 'notifies faction channel of no other events' do
+      expect(@chans[my_channel].messages.size).to be <= 2
+    end
+
+    it 'notifies news channel of the map reset' do
+      expect(@chans[news_channel].messages).to include('[CONQUEST] MAP RESET!!!')
+    end
+    it 'notifies news channel of the map reset' do
+      expect(@chans[news_channel].messages).to include(
+        '[CONQUEST]    1 (  0,   0) (neutral)[0] invaded by faction 1000[1000]'
+      )
+    end
+    it 'notifies news channel of no other events' do
+      expect(@chans[news_channel].messages.size).to be <= 2
+    end
+
+    context 'when attacker fails' do
+      before :each do
+        @chans[my_channel].messages.clear
+        @chans[news_channel].messages.clear
+        @conn.respond('getConquestMap', '', {'conquest_map' => {'map' => [
+          make_tile(1),
+          make_tile(2),
+        ]}})
+        bot.plugins[0].get_timers[0].fire!
+      end
+
+      it 'notifies my channel of the failure' do
+        expect(@chans[my_channel].messages).to be == [
+          '[CONQUEST]    1 (  0,   0) Failed invasion against (neutral)'
+        ]
+      end
+
+      it 'notifies news channel of the failure' do
+        expect(@chans[news_channel].messages).to be == [
+          '[CONQUEST]    1 (  0,   0) (neutral)[0] holds off faction 1000[1000]'
+        ]
+      end
+    end
+
+    context 'when a second faction subsequently attacks' do
+      before :each do
+        @chans[my_channel].messages.clear
+        @chans[news_channel].messages.clear
+        @conn.respond('getConquestMap', '', {'conquest_map' => {'map' => [
+          make_tile(1, nil, 1000),
+          make_tile(2, nil, 1001),
+        ]}})
+        bot.plugins[0].get_timers[0].fire!
+      end
+
+      it 'notifies news channel of the invasion' do
+        expect(@chans[news_channel].messages).to be == [
+          '[CONQUEST]    2 (  0,   0) (neutral)[0] invaded by faction 1001[1001]'
+        ]
+      end
+    end
+  end
+
   # TODO: conquest news options
 end

@@ -329,11 +329,30 @@ module Cinch; module Plugins; class TyrantConquestPoll
         }
         Channel(self.class.report_channel).send("[CONQUEST] MAP RESET!!!")
       end
-      @reset_acknowledged = true
 
       @map_json['conquest_map']['map'].each { |t|
-        @map_hash[t['system_id']] = t
+        id = t['system_id']
+        prev_t = @map_hash[id]
+        @map_hash[id] = t
+
+        current_attacker = t['attacking_faction_id'].to_i
+        old_attacker = prev_t['attacking_faction_id'].to_i
+
+        if !@reset_acknowledged
+          # If we've just reset, look at all new attacks.
+          # We display them even if they are the same.
+          # (Faction attacks a tile, waits for map reset, attacks same tile)
+          handle_new_attack(t) if current_attacker != 0
+        elsif old_attacker != current_attacker
+          # If reset is not fresh, we just check to see if:
+          # Anyone has failed an invasion
+          # Anyone has started a new invasion
+          handle_failed_attack(t, prev_t) if old_attacker != 0
+          handle_new_attack(t) if current_attacker != 0
+        end
       }
+
+      @reset_acknowledged = true
 
       return
     end
