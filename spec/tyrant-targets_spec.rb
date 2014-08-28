@@ -15,10 +15,13 @@ describe Cinch::Plugins::TyrantTargets do
     expect(bot).to be_a Cinch::Bot
   end
 
+  before :each do
+    @conn = FakeConnection.new
+    @tyrant = Tyrants.get_fake('testplayer', @conn)
+  end
+
   describe '!targets' do
     before :each do
-      @conn = FakeConnection.new
-      @tyrant = Tyrants.get_fake('testplayer', @conn)
       expect(Tyrants).to receive(:get).with('testplayer').and_return(@tyrant)
       @conn.respond('getFactionInfo', '', {'rating' => 1000})
     end
@@ -75,6 +78,35 @@ describe Cinch::Plugins::TyrantTargets do
       ]})
       replies = get_replies_text(message)
       expect(replies).to be == ['3: THE ENEMY* (1050)']
+    end
+  end
+
+  describe 'flood control' do
+    def msg
+      make_message(bot, '!targets', channel: '#test')
+    end
+
+    before :each do
+      allow(Tyrants).to receive(:get).with('testplayer').and_return(@tyrant)
+      @conn.respond('getFactionInfo', '', {'rating' => 1000})
+      @conn.respond('getFactionRivals', 'rating%5Flow=0', {'rivals' => []})
+      @conn.respond('getFactionRivals', 'rating%5Fhigh=0', {'rivals' => []})
+    end
+
+    it 'warns on second' do
+      get_replies(msg)
+      replies = get_replies_text(msg)
+      expect(replies).to be == ['test: Requesting targets too often. Cool down a bit.']
+    end
+
+    it 'remains silent on third and fourth' do
+      get_replies(msg)
+      get_replies(msg)
+      replies = get_replies_text(msg)
+      expect(replies).to be == []
+
+      replies = get_replies_text(msg)
+      expect(replies).to be == []
     end
   end
 end
