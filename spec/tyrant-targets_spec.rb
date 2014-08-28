@@ -79,6 +79,30 @@ describe Cinch::Plugins::TyrantTargets do
       replies = get_replies_text(message)
       expect(replies).to be == ['3: THE ENEMY* (1050)']
     end
+
+    describe 'with name' do
+      let(:message) { make_message(bot, '!targets grepme', channel: '#test') }
+
+      it 'filters' do
+        @conn.respond('getFactionRivals', 'rating%5Flow=0', {'rivals' => []})
+        @conn.respond('getFactionRivals', 'rating%5Fhigh=0', {'rivals' => [
+          {
+            'faction_id' => '2001',
+            'rating' => '1050',
+            'name' => 'THE ENEMY',
+            'infamy_gain' => 0,
+          },
+          {
+            'faction_id' => '2000',
+            'rating' => '1050',
+            'name' => 'grepme',
+            'infamy_gain' => 0,
+          }
+        ]})
+        replies = get_replies_text(message)
+        expect(replies).to be == ['6: grepme (1050)']
+      end
+    end
   end
 
   describe 'flood control' do
