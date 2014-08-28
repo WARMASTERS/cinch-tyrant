@@ -30,6 +30,7 @@ describe Cinch::Plugins::TyrantConquest do
     it 'shows invasions' do
       bot.plugins[0].stub(:map_hash).and_return({
         '1' => make_tile(1, 1001, 1000),
+        '2' => make_tile(2),
       })
       replies = get_replies_text(message)
       expect(replies.shift).to be =~
@@ -40,6 +41,7 @@ describe Cinch::Plugins::TyrantConquest do
     it 'shows defenses' do
       bot.plugins[0].stub(:map_hash).and_return({
         '1' => make_tile(1, 1000, 1001),
+        '2' => make_tile(2),
       })
       replies = get_replies_text(message)
       expect(replies.shift).to be =~
@@ -50,6 +52,7 @@ describe Cinch::Plugins::TyrantConquest do
     it 'shows uncontested tiles' do
       bot.plugins[0].stub(:map_hash).and_return({
         '1' => make_tile(1, 1000, cr: 2),
+        '2' => make_tile(2),
       })
       replies = get_replies_text(message)
       expect(replies).to be == [
@@ -64,6 +67,7 @@ describe Cinch::Plugins::TyrantConquest do
     it 'lists uncontested tiles' do
       bot.plugins[0].stub(:map_hash).and_return({
         '1' => make_tile(1, 1000, cr: 2),
+        '2' => make_tile(2),
       })
       replies = get_replies_text(message)
       expect(replies).to be == [
@@ -78,6 +82,7 @@ describe Cinch::Plugins::TyrantConquest do
     it 'lists tiles of that faction' do
       bot.plugins[0].stub(:map_hash).and_return({
         '1' => make_tile(1, 1001, cr: 2),
+        '2' => make_tile(2),
       })
       replies = get_replies_text(message)
       expect(replies).to be == [
