@@ -64,6 +64,11 @@ describe Cinch::Plugins::TyrantMission do
           999 => FakeCard.new(999, 'wat'),
           1001 => commander1,
         },
+        :cards_by_name => {
+          'my first card story' => card1,
+          'wat' => FakeCard.new(999, 'wat'),
+          'commander 1' => commander1,
+        }
       })
     end
 
@@ -74,6 +79,11 @@ describe Cinch::Plugins::TyrantMission do
 
     it 'filters by cards with bare ID' do
       message = make_message(bot, '!mission 1', channel: '#test')
+      expect(get_replies_text(message)).to be == ['1 matches: Mission 1']
+    end
+
+    it 'filters by cards by name' do
+      message = make_message(bot, '!mission my first card story', channel: '#test')
       expect(get_replies_text(message)).to be == ['1 matches: Mission 1']
     end
 
@@ -96,6 +106,14 @@ describe Cinch::Plugins::TyrantMission do
       message = make_message(bot, '!mission [999]', channel: '#test')
       expect(get_replies_text(message)).to be == [
         '3 matches: Maybe you should narrow down a bit more.'
+      ]
+    end
+
+    it 'complains for invalid names' do
+      message = make_message(bot, '!mission notacard', channel: '#test')
+      expect(get_replies_text(message)).to be == [
+        "Errors: No card named 'notacard'",
+        '3 matches: Maybe you should narrow down a bit more.',
       ]
     end
   end
