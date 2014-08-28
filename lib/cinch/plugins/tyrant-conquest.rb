@@ -85,7 +85,7 @@ module Cinch; module Plugins; class TyrantConquest
       elsif ids.size == 0
         # Couldn't find it and faction is not a number. Just fail.
         m.reply("Faction #{faction} is not on the map")
-        reply
+        return
       else
         m.reply('Multiple factions with this name! ' + ids.to_a.to_s)
         return
