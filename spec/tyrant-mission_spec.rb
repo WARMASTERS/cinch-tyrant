@@ -119,6 +119,14 @@ describe Cinch::Plugins::TyrantMission do
       ]
     end
 
+    it 'complains for invalid IDs' do
+      message = make_message(bot, '!mission [9999]', channel: '#test')
+      expect(get_replies_text(message)).to be == [
+        'Errors: No card with ID 9999',
+        '3 matches: Maybe you should narrow down a bit more.',
+      ]
+    end
+
     it 'complains for invalid names' do
       message = make_message(bot, '!mission notacard', channel: '#test')
       expect(get_replies_text(message)).to be == [
