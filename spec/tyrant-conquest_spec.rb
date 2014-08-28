@@ -126,4 +126,30 @@ describe Cinch::Plugins::TyrantConquest do
       ]
     end
   end
+
+  context 'with ID 0 (neutral tiles)' do
+    before :each do
+      bot.plugins[0].stub(:map_hash).and_return({
+        '1' => make_tile(1, 1001, cr: 2),
+        '2' => make_tile(2, cr: 1),
+        '3' => make_tile(3, cr: 3),
+        '4' => make_tile(4, cr: 3),
+      })
+    end
+
+    it 'lists neutral tiles' do
+      replies = get_replies_text(make_message(bot, '!tiles 0', channel: '#test'))
+      expect(replies).to be == [
+        'There are 3 neutral tiles totaling 7 CR. 1 CR: 1, 3 CR: 2'
+      ]
+    end
+
+    it 'lists neutral tiles with -v' do
+      replies = get_replies_text(make_message(bot, '!tiles -v 0', channel: '#test'))
+      expect(replies).to be == [
+        'There are 3 neutral tiles totaling 7 CR. 1 CR: 1, 3 CR: 2',
+        '   2 (  0,   0);    3 (  0,   0);    4 (  0,   0)',
+      ]
+    end
+  end
 end
