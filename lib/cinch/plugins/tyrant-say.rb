@@ -59,7 +59,7 @@ module Cinch; module Plugins; class TyrantSay
     end
 
     if message.length > MAX_LENGTH && !is_master
-      diff = MAX_LENGTH - message.length
+      diff = message.length - MAX_LENGTH
       m.reply("Your message is too long. Remove #{diff} characters.", true)
       return
     end
