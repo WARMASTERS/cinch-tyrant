@@ -380,29 +380,8 @@ module Cinch; module Plugins; class TyrantConquestPoll
       current_attacker = t['attacking_faction_id'].to_i
       old_attacker = prev_t['attacking_faction_id'].to_i
       if old_attacker != current_attacker
-        name ||= TyrantConquest::tile_name(t)
-        prefix ||= '[CONQUEST] ' + name + ' '
-
-        owner = ::Tyrant::sanitize_or_default(t['faction_name'], '(neutral)')
         if old_attacker != 0 && old_attacker != current_owner
-          attacker = ::Tyrant::sanitize_or_default(
-            prev_t['attacking_faction_name'], '(nil)'
-          )
-
-          if @ctrack_enabled
-            o = "#{owner}[#{current_owner.to_i}]"
-            a = "#{attacker}[#{old_attacker.to_i}]"
-            message = "#{prefix}#{o} holds off #{a}"
-            Channel(self.class.report_channel).send(message)
-          end
-
-          if f = @tiles_by_id[current_owner]
-            send_message(f, name, 'Defended against', attacker, :defense_win)
-          end
-          if f = @tiles_by_id[old_attacker]
-            send_message(f, name, 'Failed invasion against', owner,
-                         :invasion_loss)
-          end
+          handle_failed_attack(t, prev_t)
         end
         handle_new_attack(t) if current_attacker != 0
       end
@@ -483,6 +462,35 @@ module Cinch; module Plugins; class TyrantConquestPoll
   end
 
   private
+
+  def handle_failed_attack(t, prev_t)
+    id = t['system_id']
+    raise "#{id} != #{prev_t['system_id']}" unless id == prev_t['system_id']
+    name = TyrantConquest::tile_name(t)
+
+    owner_id = t['faction_id'].to_i
+    owner_name = ::Tyrant::sanitize_or_default(t['faction_name'], '(neutral)')
+
+    attacker_id = prev_t['attacking_faction_id'].to_i
+    attacker_name = ::Tyrant::sanitize_or_default(
+      prev_t['attacking_faction_name'], '(nil)'
+    )
+
+    if @ctrack_enabled
+      o = "#{owner_name}[#{owner_id.to_i}]"
+      a = "#{attacker_name}[#{attacker_id.to_i}]"
+      message = "[CONQUEST] #{name} #{o} holds off #{a}"
+      Channel(self.class.report_channel).send(message)
+    end
+
+    if f = @tiles_by_id[owner_id]
+      send_message(f, name, 'Defended against', attacker_name, :defense_win)
+    end
+    if f = @tiles_by_id[attacker_id]
+      send_message(f, name, 'Failed invasion against', owner_name,
+                   :invasion_loss)
+    end
+  end
 
   def handle_new_attack(t)
     id = t['system_id']
