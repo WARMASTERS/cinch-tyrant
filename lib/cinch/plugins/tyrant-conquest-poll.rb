@@ -404,28 +404,7 @@ module Cinch; module Plugins; class TyrantConquestPoll
                          :invasion_loss)
           end
         end
-        if current_attacker != 0
-          attacker = ::Tyrant::sanitize_or_default(
-            t['attacking_faction_name'], '(nil)'
-          )
-
-          if @ctrack_enabled
-            o = "#{owner}[#{current_owner.to_i}]"
-            a = "#{attacker}[#{current_attacker.to_i}]"
-            message = "#{prefix}#{o} invaded by #{a}"
-            Channel(self.class.report_channel).send(message)
-          end
-
-          if f = @tiles_by_id[current_owner]
-            send_message(f, name, 'Under attack by', attacker, :defense_start)
-          end
-          if f = @tiles_by_id[current_attacker]
-            send_message(f, name, 'New invasion against', owner, :invasion_start)
-          end
-          if f = @invasions_by_id[current_attacker]
-            f.invasion_tile = id
-          end
-        end
+        handle_new_attack(t) if current_attacker != 0
       end
 
       no_attack_factions.delete(current_attacker) if current_attacker != 0
@@ -502,4 +481,37 @@ module Cinch; module Plugins; class TyrantConquestPoll
       m.reply(msg + ", and it is staying that way")
     end
   end
+
+  private
+
+  def handle_new_attack(t)
+    id = t['system_id']
+    name = TyrantConquest::tile_name(t)
+
+    owner_id = t['faction_id'].to_i
+    owner_name = ::Tyrant::sanitize_or_default(t['faction_name'], '(neutral)')
+
+    attacker_id = t['attacking_faction_id'].to_i
+    attacker_name = ::Tyrant::sanitize_or_default(
+      t['attacking_faction_name'], '(nil)'
+    )
+
+    if @ctrack_enabled
+      o = "#{owner_name}[#{owner_id.to_i}]"
+      a = "#{attacker_name}[#{attacker_id.to_i}]"
+      message = "[CONQUEST] #{name} #{o} invaded by #{a}"
+      Channel(self.class.report_channel).send(message)
+    end
+
+    if f = @tiles_by_id[owner_id]
+      send_message(f, name, 'Under attack by', attacker_name, :defense_start)
+    end
+    if f = @tiles_by_id[attacker_id]
+      send_message(f, name, 'New invasion against', owner_name, :invasion_start)
+    end
+    if f = @invasions_by_id[attacker_id]
+      f.invasion_tile = id
+    end
+  end
+
 end; end; end
