@@ -99,5 +99,37 @@ describe Cinch::Plugins::TyrantTile do
     end
   end
 
-  # TODO: !tile on a tile we're attacking, or we're defending
+  describe '!tile on a tile we are defending' do
+    before :each do
+      @conn = FakeConnection.new
+      @tyrant = Tyrants.get_fake('testplayer', @conn)
+      expect(Tyrants).to receive(:get).with('testplayer').and_return(@tyrant)
+      bot.plugins[0].stub(:shared).and_return({:conquest_map_hash => {
+        '1' => make_tile(1, 1000, 1001, x: 1, y: 2),
+        '2' => make_tile(2, 1001, x: 3, y: 4),
+        '3' => make_tile(3, 1002, x: 5, y: 6),
+      }})
+    end
+
+    let(:message) { make_message(bot, '!tile 1', channel: '#test') }
+
+    it 'shows tile info on tile with no decks' do
+      @conn.respond('getConquestTileInfo', 'system_id=1', {'system' => {
+        'max_health' => 100,
+        'attacking_faction_id' => '1000',
+        'attack_start_time' => 900,
+        'attack_end_time' => 1500,
+        'slots' => {
+          '1' => {'commander_id' => 1000, 'health' => '100', 'defeated' => '0'},
+        },
+      }})
+      allow(Time).to receive(:now).and_return(1200)
+      replies = get_replies_text(message)
+      expect(replies).to be == [
+        ' 1E,  2S: faction 1000, CR: 1',
+        '1/1 (100.00%) slots alive. 100/100 (100.00%) health left. 00:05:00 (50.00%) left.'
+      ]
+    end
+  end
+
 end
