@@ -47,6 +47,13 @@ describe Cinch::Plugins::TyrantSay do
       replies = get_replies_text(message)
       expect(replies).to be == ['test: Your message was NOT posted.']
     end
+
+    it 'warns for messages that are too long' do
+      msg = make_message(bot, '!say ' + ('a') * 200, channel: '#test')
+      allow(msg.user).to receive(:master?).and_return(false)
+      replies = get_replies_text(msg)
+      expect(replies).to be == ['test: Your message is too long. Remove 40 characters.']
+    end
   end
 
   describe 'flood control' do
