@@ -103,6 +103,29 @@ describe Cinch::Plugins::TyrantConquestPoll do
 
       it_behaves_like 'gaining a tile'
     end
+
+    context 'failing the invasion' do
+      before(:each) do
+        @chans.each_value { |c| c.messages.clear }
+        @conn.respond('getConquestMap', '', {'conquest_map' => {'map' => [
+          make_tile(1, 1000),
+          make_tile(2, 1001),
+        ]}})
+        bot.plugins[0].get_timers[0].fire!
+      end
+
+      it 'notifies my faction channel' do
+        expect(@chans[my_channel].messages.shift).to be ==
+          '[CONQUEST]    2 (  0,   0) Failed invasion against faction 1001'
+        expect(@chans[my_channel].messages).to be == []
+      end
+
+      it 'notifies the news channel' do
+        expect(@chans[news_channel].messages.shift).to be ==
+          '[CONQUEST]    2 (  0,   0) faction 1001[1001] holds off faction 1000[1000]'
+        expect(@chans[news_channel].messages).to be == []
+      end
+    end
   end
 
   context 'when my faction defends a tile' do
@@ -137,6 +160,29 @@ describe Cinch::Plugins::TyrantConquestPoll do
       end
 
       it_behaves_like 'losing a tile'
+    end
+
+    context 'winning the defense' do
+      before(:each) do
+        @chans.each_value { |c| c.messages.clear }
+        @conn.respond('getConquestMap', '', {'conquest_map' => {'map' => [
+          make_tile(1, 1000),
+          make_tile(2, 1001),
+        ]}})
+        bot.plugins[0].get_timers[0].fire!
+      end
+
+      it 'notifies my faction channel' do
+        expect(@chans[my_channel].messages.shift).to be ==
+          '[CONQUEST]    1 (  0,   0) Defended against faction 1001'
+        expect(@chans[my_channel].messages).to be == []
+      end
+
+      it 'notifies the news channel' do
+        expect(@chans[news_channel].messages.shift).to be ==
+          '[CONQUEST]    1 (  0,   0) faction 1000[1000] holds off faction 1001[1001]'
+        expect(@chans[news_channel].messages).to be == []
+      end
     end
   end
 
