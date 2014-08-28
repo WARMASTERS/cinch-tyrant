@@ -59,6 +59,17 @@ describe Cinch::Plugins::TyrantConquest do
         'faction 1000\'s uncontested tiles (1, 2 CR): Use -v to list'
       ]
     end
+
+    it 'informs us if we have no tiles on the map' do
+      bot.plugins[0].stub(:map_hash).and_return({
+        '1' => make_tile(1, 1001, cr: 2),
+        '2' => make_tile(2),
+      })
+      replies = get_replies_text(message)
+      expect(replies).to be == [
+        'Faction 1000 is not on the map'
+      ]
+    end
   end
 
   context 'with -v argument' do
