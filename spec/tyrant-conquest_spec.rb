@@ -101,6 +101,17 @@ describe Cinch::Plugins::TyrantConquest do
       ]
     end
 
+    it 'lists tiles that faction is attacking' do
+      bot.plugins[0].stub(:map_hash).and_return({
+        '1' => make_tile(1, 1000, 1001, cr: 2),
+        '2' => make_tile(2),
+      })
+      replies = get_replies_text(message)
+      expect(replies.shift).to be =~
+        /1 \(  0,   0\) faction 1001 vs faction 1000, -?\d+:\d\d:\d\d left, CR: 2/
+        expect(replies).to be == []
+    end
+
     it 'complains if no faction with that name exists' do
       bot.plugins[0].stub(:map_hash).and_return({
         '1' => make_tile(1, 1000, cr: 2),
