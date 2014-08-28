@@ -1,3 +1,8 @@
+require 'simplecov'
+SimpleCov.start {
+  add_filter '/spec/'
+}
+
 require 'cinch'
 require 'cinch/test'
 require 'rspec/mocks'

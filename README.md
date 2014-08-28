@@ -15,6 +15,7 @@ Synapse Games.
 
   * [cinch-test](https://github.com/jayferd/cinch-test)
   * [rspec](https://github.com/rspec/rspec)
+  * [simplecov](https://github.com/colszowka/simplecov)
 
 ## Install
 
