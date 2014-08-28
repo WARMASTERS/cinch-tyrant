@@ -96,4 +96,29 @@ describe Cinch::Plugins::TyrantConquest do
       ]
     end
   end
+
+  context 'with ID of a faction' do
+    let(:message) { make_message(bot, '!tiles 1001', channel: '#test') }
+
+    it 'lists tiles of that faction' do
+      bot.plugins[0].stub(:map_hash).and_return({
+        '1' => make_tile(1, 1001, cr: 2),
+        '2' => make_tile(2),
+      })
+      replies = get_replies_text(message)
+      expect(replies).to be == [
+        'faction 1001\'s uncontested tiles (1, 2 CR): Use -v to list'
+      ]
+    end
+
+    it 'complains if no faction with that ID exists' do
+      bot.plugins[0].stub(:map_hash).and_return({
+        '1' => make_tile(1, 1000, cr: 2),
+      })
+      replies = get_replies_text(message)
+      expect(replies).to be == [
+        'Faction 1001 is not on the map'
+      ]
+    end
+  end
 end
