@@ -1,6 +1,7 @@
 require 'cinch'
 require 'tyrant'
 require 'tyrant/rivals'
+require 'tyrant/war'
 
 module Cinch; module Plugins; class TyrantDeclare
   include Cinch::Plugin
@@ -47,7 +48,11 @@ module Cinch; module Plugins; class TyrantDeclare
 
     p = "target_faction_id=#{rival['faction_id']}&infamy_gain=0"
     json = tyrant.make_request('declareFactionWar', p)
-    m.reply(json['result'])
-    warn(json.to_s) if !json['result']
+    if json['result'] && json['war_info']
+      m.reply(tyrant.format_wars([json['war_info']]))
+    else
+      m.reply(json['result'].nil? ? 'nil' : json['result'])
+      warn(json.to_s)
+    end
   end
 end; end; end

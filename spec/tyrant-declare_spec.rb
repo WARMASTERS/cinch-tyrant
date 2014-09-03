@@ -66,6 +66,17 @@ describe Cinch::Plugins::TyrantDeclare do
       expect(replies).to be == ['No, that would get us infamy']
     end
 
+    let(:war_info) {{
+      'faction_war_id' => '1',
+      'name' => 'THE ENEMY',
+      'attacker_faction_id' => '1000',
+      'defender_faction_id' => '1001',
+      'start_time' => Time.now.to_i.to_s,
+      'duration' => '6',
+      'atk_pts' => '0',
+      'def_pts' => '0',
+    }}
+
     context 'when declaration would earn less FP' do
       before :each do
         @conn.respond('getFactionRivals', 'name=aa', {'rivals' => [
@@ -89,10 +100,12 @@ describe Cinch::Plugins::TyrantDeclare do
         m.user.stub(:master?).and_return(true)
         @conn.respond(
           'declareFactionWar', 'target_faction_id=2001&infamy_gain=0',
-          {'result' => true}
+          {'result' => true, 'war_info' => war_info}
         )
         replies = get_replies_text(m)
-        expect(replies).to be == [true]
+        expect(replies.shift).to be =~
+          /^\s*1 - faction 1000 vs THE ENEMY 0-0 \(\+0\) \d\d:\d\d:\d\d left$/
+        expect(replies).to be == []
       end
     end
 
@@ -108,10 +121,32 @@ describe Cinch::Plugins::TyrantDeclare do
       ]})
       @conn.respond(
         'declareFactionWar', 'target_faction_id=2001&infamy_gain=0',
-        {'result' => true}
+        {'result' => true, 'war_info' => war_info}
       )
       replies = get_replies_text(message)
-      expect(replies).to be == [true]
+      expect(replies.shift).to be =~
+        /^\s*1 - faction 1000 vs THE ENEMY 0-0 \(\+0\) \d\d:\d\d:\d\d left$/
+      expect(replies).to be == []
+    end
+
+    it 'warns if something went wrong when declaring' do
+      @conn.respond('getFactionRivals', 'name=aa', {'rivals' => [
+        {
+          'faction_id' => '2001',
+          'rating' => '1',
+          'name' => 'baa',
+          'infamy_gain' => 0,
+          'less_rating_time' => 0,
+        },
+      ]})
+      failure = { 'result' => false }
+      @conn.respond(
+        'declareFactionWar', 'target_faction_id=2001&infamy_gain=0',
+        failure
+      )
+      expect(bot.plugins.first).to receive(:warn).with(failure.to_s)
+      replies = get_replies_text(message)
+      expect(replies).to be == [false]
     end
   end
 end
