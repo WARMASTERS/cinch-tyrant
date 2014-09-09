@@ -44,14 +44,7 @@ module Cinch; module Plugins; class TyrantCard
 
   def initialize(*args)
     super
-    @cards_by_id = shared[:cards_by_id]
-    @cards_by_name = shared[:cards_by_name]
-    @keys = @cards_by_name.keys
-    @comma_names = Hash.new { |h, k| h[k] = [] }
-    @cards_by_name.values.select { |c| c.name.include?(?,) }.each { |c|
-      parts = c.name.split(', ')
-      @comma_names[parts.first.downcase] << c.name.downcase
-    }
+    _recard
   end
 
   def resolve_card(name, num_suggestions = 3)
@@ -254,8 +247,21 @@ module Cinch; module Plugins; class TyrantCard
     by_id, by_name = ::Tyrant::Cards::parse_cards(config[:xml_file])
     shared[:cards_by_id] = by_id
     shared[:cards_by_name] = by_name
-    @cards_by_id = by_id
-    @cards_by_name = by_name
+    _recard
     m.reply('Recarded.')
   end
+
+  private
+
+  def _recard
+    @cards_by_id = shared[:cards_by_id]
+    @cards_by_name = shared[:cards_by_name]
+    @keys = @cards_by_name.keys
+    @comma_names = Hash.new { |h, k| h[k] = [] }
+    @cards_by_name.values.select { |c| c.name.include?(?,) }.each { |c|
+      parts = c.name.split(', ')
+      @comma_names[parts.first.downcase] << c.name.downcase
+    }
+  end
+
 end; end; end
