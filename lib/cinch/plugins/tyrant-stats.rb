@@ -9,7 +9,7 @@ module Cinch; module Plugins; class TyrantStats
 
   WAIT_TIME = 10 * ::Tyrant::Time::MINUTE
 
-  match(/stats/i, method: :stats)
+  match(/stats(?:\s+(\S+))?/i, method: :stats)
 
   HALP = 'Gives the link to the stats page with player and war data. ' +
          'The link is unique to you and must NEVER be shared. ' +
@@ -26,7 +26,7 @@ module Cinch; module Plugins; class TyrantStats
     ),
   ]
 
-  def stats(m)
+  def stats(m, for_username)
     return unless is_member?(m)
 
     user = BOT_CHANNELS[m.channel.name].player
@@ -44,7 +44,8 @@ module Cinch; module Plugins; class TyrantStats
       return
     end
 
-    user = m.user.name.downcase
+    user = !for_username.nil? && m.user.master? ? for_username : m.user.name
+    user.downcase!
     pass = IO.read(password_filename)
     pass = Digest::SHA1.hexdigest(user + '$' + pass)
 
