@@ -53,7 +53,7 @@ describe Cinch::Plugins::TyrantVault do
 
   describe 'vault alerts' do
     it 'fires' do
-      expect(plugin).to receive(:config).exactly(3).and_return({
+      allow(plugin).to receive(:config).and_return({
         :checker => 'testplayer',
         :alert_channels => ['#vaultalerts'],
       })
