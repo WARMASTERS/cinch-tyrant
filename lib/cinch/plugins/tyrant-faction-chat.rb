@@ -33,6 +33,10 @@ module Cinch; module Plugins; class TyrantFactionChat < TyrantPoll
 
     def poll_result(json)
       new_messages = json['messages']
+      # If two messages are posted in the same second,
+      # getNewFactionMessages may return them in an "unexpected" order.
+      # Explicitly sort by post ID to deal with that.
+      new_messages.sort_by! { |m| m['post_id'].to_i }
       @last = new_messages[-1]['post_id'] unless new_messages.empty?
       new_messages
     end

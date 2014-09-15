@@ -51,5 +51,45 @@ describe Cinch::Plugins::TyrantFactionChat do
     end
   end
 
+  shared_examples 'posting two messages in the right order' do
+    before :each do
+      @conn.respond('getNewFactionMessages', 'last_post=60', {'messages' =>
+        two_messages,
+      })
+      expect(Tyrant).to receive(:name_of_id).with('2').twice.and_return('usertwo')
+      bot.plugins[0].get_timers[0].fire!
+    end
+
+    it 'posts new messages' do
+      expect(@chan.messages).to be == [
+        '[FACTION] usertwo: m2',
+        '[FACTION] usertwo: m3',
+      ]
+    end
+
+    it 'updates last post before doing next poll' do
+      @conn.respond('getNewFactionMessages', 'last_post=62', {'messages' => []})
+      bot.plugins[0].get_timers[0].fire!
+    end
+  end
+
+  context 'with two new messages in the right order' do
+    let(:two_messages) {[
+      {'post_id' => '61', 'message' => 'm2', 'user_id' => '2'},
+      {'post_id' => '62', 'message' => 'm3', 'user_id' => '2'},
+    ]}
+
+    it_behaves_like 'posting two messages in the right order'
+  end
+
+  context 'with two new messages in reversed order' do
+    let(:two_messages) {[
+      {'post_id' => '62', 'message' => 'm3', 'user_id' => '2'},
+      {'post_id' => '61', 'message' => 'm2', 'user_id' => '2'},
+    ]}
+
+    it_behaves_like 'posting two messages in the right order'
+  end
+
   # TODO: !chat (on|off)
 end
