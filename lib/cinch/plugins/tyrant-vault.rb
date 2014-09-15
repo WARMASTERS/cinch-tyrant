@@ -32,7 +32,7 @@ module Cinch; module Plugins; class TyrantVault
     end
 
     time_left = ::Tyrant::Time::format_time(@vault_time - Time.now.to_i)
-    m.reply('[VAULT] ' + @vault.join(', ') + '. Available for ' + time_left)
+    m.reply("[VAULT] #{vault_names}. Available for #{time_left}")
   end
 
   def revault(m)
@@ -49,13 +49,17 @@ module Cinch; module Plugins; class TyrantVault
       return false
     end
 
-    @vault = json['cards_for_sale'].map { |x|
-      card = shared[:cards_by_id][x.to_i]
-      card ? card.name : 'Unknown card ' + x
-    }
-
+    @vault_ids = json['cards_for_sale']
+    @vault_names = nil
     @vault_time = json['cards_for_sale_starting'].to_i + VAULT_PERIOD
 
     true
+  end
+
+  def vault_names
+    @vault_names ||= @vault_ids.map { |x|
+      card = shared[:cards_by_id] && shared[:cards_by_id][x.to_i]
+      card ? card.name : 'Unknown card ' + x
+    }.join(', ')
   end
 end; end; end
