@@ -15,6 +15,7 @@ describe Cinch::Plugins::TyrantVault do
   before :each do
     @conn = FakeConnection.new
     @tyrant = Tyrants.get_fake('testplayer', @conn)
+    set_up_vault
   end
 
   def set_up_vault
@@ -40,7 +41,6 @@ describe Cinch::Plugins::TyrantVault do
     let(:message) { make_message(bot, '!vault', channel: '#test') }
 
     it 'shows vault cards' do
-      set_up_vault
       set_up_cards
       replies = get_replies_text(message)
       expect(replies.shift).to be =~
@@ -50,4 +50,21 @@ describe Cinch::Plugins::TyrantVault do
   end
 
   # TODO: revault?!
+
+  describe 'vault alerts' do
+    it 'fires' do
+      expect(plugin).to receive(:config).exactly(3).and_return({
+        :checker => 'testplayer',
+        :alert_channel => '#vaultalerts',
+      })
+      set_up_cards
+      set_up_vault
+      chan = FakeChannel.new
+      expect(plugin).to receive(:Channel).with('#vaultalerts').and_return(chan)
+      plugin.alert
+      expect(chan.messages.shift).to be =~
+        /^\[NEW VAULT\] My first card, Another awesome card$/
+      expect(chan.messages).to be == []
+    end
+  end
 end

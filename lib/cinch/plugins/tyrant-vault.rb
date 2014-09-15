@@ -16,11 +16,13 @@ module Cinch; module Plugins; class TyrantVault
   ]
 
   VAULT_PERIOD = 3 * ::Tyrant::Time::HOUR
+  # Delay this number of seconds after a new vault before alerting on it
+  VAULT_ALERT_DELAY = 2
 
   def initialize(*args)
     super
-    @vault = ['Orbo'] * 8
-    @vault_time = 0
+    _revault
+    schedule_alert
   end
 
   def vault(m)
@@ -61,5 +63,18 @@ module Cinch; module Plugins; class TyrantVault
       card = shared[:cards_by_id] && shared[:cards_by_id][x.to_i]
       card ? card.name : 'Unknown card ' + x
     }.join(', ')
+  end
+
+  def schedule_alert
+    return unless config[:alert_channel]
+    time_left = @vault_time - Time.now.to_i
+    time = time_left + VAULT_ALERT_DELAY
+    Timer(time, {:shots => 1, :start_automatically => false, :method => :alert})
+  end
+
+  def alert
+    _revault
+    Channel(config[:alert_channel]).send('[NEW VAULT] ' + vault_names)
+    schedule_alert
   end
 end; end; end
