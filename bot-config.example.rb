@@ -167,7 +167,7 @@ BOT_PLUGIN_OPTIONS = {
   Cinch::Plugins::TyrantVault => {
     # Name of player (in Settings::PLAYERS) who will look up vault data.
     :checker => 'mychecker',
-    # Channel to which alerts will be sent.
-    :alert_channel => '#cinch-tyrant-vault',
+    # Channels to which alerts will be sent.
+    :alert_channels => ['#cinch-tyrant-vault'],
   },
 }

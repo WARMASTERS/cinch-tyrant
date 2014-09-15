@@ -66,7 +66,7 @@ module Cinch; module Plugins; class TyrantVault
   end
 
   def schedule_alert
-    return unless config[:alert_channel]
+    return unless config[:alert_channels]
     time_left = @vault_time - Time.now.to_i
     time = time_left + VAULT_ALERT_DELAY
     Timer(time, {:shots => 1, :start_automatically => false, :method => :alert})
@@ -74,7 +74,9 @@ module Cinch; module Plugins; class TyrantVault
 
   def alert
     _revault
-    Channel(config[:alert_channel]).send('[NEW VAULT] ' + vault_names)
+    channels = config[:alert_channels]
+    msg = '[NEW VAULT] ' + vault_names
+    channels.each { |c| Channel(c).send(msg) }
     schedule_alert
   end
 end; end; end

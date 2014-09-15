@@ -55,7 +55,7 @@ describe Cinch::Plugins::TyrantVault do
     it 'fires' do
       expect(plugin).to receive(:config).exactly(3).and_return({
         :checker => 'testplayer',
-        :alert_channel => '#vaultalerts',
+        :alert_channels => ['#vaultalerts'],
       })
       set_up_cards
       set_up_vault
