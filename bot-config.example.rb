@@ -169,5 +169,9 @@ BOT_PLUGIN_OPTIONS = {
     :checker => 'mychecker',
     # Channels to which alerts will be sent.
     :alert_channels => ['#cinch-tyrant-vault'],
+    # Hash[card_name => [subscriber_nicks]] of users to PM when a card appears.
+    :subscriptions => {
+      'Infantry' => ['iwanttoknow'],
+    },
   },
 }

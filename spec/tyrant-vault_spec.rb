@@ -51,7 +51,7 @@ describe Cinch::Plugins::TyrantVault do
 
   # TODO: revault?!
 
-  describe 'vault alerts' do
+  describe 'vault channel alerts' do
     it 'fires' do
       allow(plugin).to receive(:config).and_return({
         :checker => 'testplayer',
@@ -65,6 +65,38 @@ describe Cinch::Plugins::TyrantVault do
       expect(chan.messages.shift).to be =~
         /^\[NEW VAULT\] My first card, Another awesome card$/
       expect(chan.messages).to be == []
+    end
+  end
+
+  describe 'vault card subscriptions' do
+    it 'alerts the subscribers' do
+      allow(plugin).to receive(:config).and_return({
+        :checker => 'testplayer',
+        :subscriptions => {'Another awesome card' => ['iwanttoknow']}
+      })
+      set_up_cards
+      set_up_vault
+      user = FakeChannel.new
+      expect(plugin).to receive(:User).with('iwanttoknow').and_return(user)
+      expect(user).to receive(:authed?).and_return(true)
+      plugin.alert
+      expect(user.messages).to be == [
+        'Hey iwanttoknow, guess what? Another awesome card is in the vault!!!'
+      ]
+    end
+
+    it 'does not alert an unauthed person' do
+      allow(plugin).to receive(:config).and_return({
+        :checker => 'testplayer',
+        :subscriptions => {'Another awesome card' => ['iwanttoknow']}
+      })
+      set_up_cards
+      set_up_vault
+      user = FakeChannel.new
+      expect(plugin).to receive(:User).with('iwanttoknow').and_return(user)
+      expect(user).to receive(:authed?).and_return(false)
+      plugin.alert
+      expect(user.messages).to be == []
     end
   end
 end

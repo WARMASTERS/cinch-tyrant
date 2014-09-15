@@ -66,7 +66,7 @@ module Cinch; module Plugins; class TyrantVault
   end
 
   def schedule_alert
-    return unless config[:alert_channels]
+    return unless config[:alert_channels] || config[:subscriptions]
     time_left = @vault_time - Time.now.to_i
     time = time_left + VAULT_ALERT_DELAY
     Timer(time, {:shots => 1, :start_automatically => false, :method => :alert})
@@ -74,9 +74,23 @@ module Cinch; module Plugins; class TyrantVault
 
   def alert
     _revault
-    channels = config[:alert_channels]
-    msg = '[NEW VAULT] ' + vault_names.join(', ')
-    channels.each { |c| Channel(c).send(msg) }
+
+    if config[:alert_channels]
+      msg = '[NEW VAULT] ' + vault_names.join(', ')
+      config[:alert_channels].each { |c| Channel(c).send(msg) }
+    end
+
+    if config[:subscriptions]
+      vault_names.each { |name|
+        next unless config[:subscriptions][name]
+        config[:subscriptions][name].each { |subscriber|
+          msg = "Hey #{subscriber}, guess what? #{name} is in the vault!!!"
+          u = User(subscriber)
+          u.send(msg) if u.authed?
+        }
+      }
+    end
+
     schedule_alert
   end
 end; end; end
