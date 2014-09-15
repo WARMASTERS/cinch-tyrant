@@ -10,6 +10,27 @@ describe Cinch::Plugins::TyrantVault do
       self.loggers.stub('debug') { nil }
     }
   }
+  let(:plugin) { bot.plugins.first }
+
+  before :each do
+    @conn = FakeConnection.new
+    @tyrant = Tyrants.get_fake('testplayer', @conn)
+  end
+
+  def set_up_vault
+    expect(Tyrants).to receive(:get).with('testplayer').and_return(@tyrant)
+    @conn.respond('getMarketInfo', '', {
+      'cards_for_sale' => ['1', '2'],
+      'cards_for_sale_starting' => Time.now.to_i,
+    })
+  end
+
+  def set_up_cards
+    plugin.stub(:shared).and_return({:cards_by_id => {
+      1 => FakeCard.new(1, 'My first card'),
+      2 => FakeCard.new(2, 'Another awesome card'),
+    }})
+  end
 
   it 'makes a test bot' do
     expect(bot).to be_a Cinch::Bot
@@ -18,21 +39,9 @@ describe Cinch::Plugins::TyrantVault do
   describe '!vault' do
     let(:message) { make_message(bot, '!vault', channel: '#test') }
 
-    before :each do
-      @conn = FakeConnection.new
-      @tyrant = Tyrants.get_fake('testplayer', @conn)
-      expect(Tyrants).to receive(:get).with('testplayer').and_return(@tyrant)
-    end
-
     it 'shows vault cards' do
-      bot.plugins[0].stub(:shared).and_return({:cards_by_id => {
-        1 => FakeCard.new(1, 'My first card'),
-        2 => FakeCard.new(2, 'Another awesome card'),
-      }})
-      @conn.respond('getMarketInfo', '', {
-        'cards_for_sale' => ['1', '2'],
-        'cards_for_sale_starting' => Time.now.to_i,
-      })
+      set_up_vault
+      set_up_cards
       replies = get_replies_text(message)
       expect(replies.shift).to be =~
         /^\[VAULT\] My first card, Another awesome card\. Available for \d\d:\d\d:\d\d$/
