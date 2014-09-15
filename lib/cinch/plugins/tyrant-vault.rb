@@ -34,7 +34,7 @@ module Cinch; module Plugins; class TyrantVault
     end
 
     time_left = ::Tyrant::Time::format_time(@vault_time - Time.now.to_i)
-    m.reply("[VAULT] #{vault_names}. Available for #{time_left}")
+    m.reply("[VAULT] #{vault_names.join(', ')}. Available for #{time_left}")
   end
 
   def revault(m)
@@ -62,7 +62,7 @@ module Cinch; module Plugins; class TyrantVault
     @vault_names ||= @vault_ids.map { |x|
       card = shared[:cards_by_id] && shared[:cards_by_id][x.to_i]
       card ? card.name : 'Unknown card ' + x
-    }.join(', ')
+    }
   end
 
   def schedule_alert
@@ -75,7 +75,7 @@ module Cinch; module Plugins; class TyrantVault
   def alert
     _revault
     channels = config[:alert_channels]
-    msg = '[NEW VAULT] ' + vault_names
+    msg = '[NEW VAULT] ' + vault_names.join(', ')
     channels.each { |c| Channel(c).send(msg) }
     schedule_alert
   end
