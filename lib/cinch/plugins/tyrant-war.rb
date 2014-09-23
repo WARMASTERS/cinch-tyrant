@@ -148,38 +148,42 @@ module Cinch; module Plugins; class TyrantWar
     them = json[other]
 
     if player
-      if player =~ /^[0-9]+$/
-        id = player
-      else
-        id = ::Tyrant::id_of_name(player)
-      end
+      warstats_player(m, player, tyrant.faction_name, us, opponent_name, them)
+    else
+      warstats_counts(m, us, them, verbosity)
+    end
+  end
 
-      unless id
-        m.reply(player + ' not found')
-        return
-      end
-      stats = us.find { |x| x['user_id'].to_i == id.to_i }
-      side = stats ? tyrant.faction_name : (opponent_name || 'Opponent')
-      stats ||= them.find { |x| x['user_id'].to_i == id.to_i }
-      unless stats
-        m.reply(player + ' has not participated in this war')
-        return
-      end
+  def warstats_player(m, player, us_name, us, them_name, them)
+    id = player =~ /^[0-9]+$/ ? player : ::Tyrant::id_of_name(player)
 
-      dealt = stats['points'].to_i
-      taken = stats['points_against'].to_i
-
-      s = '%s (%s): Attack %dW/%dL, Defense %dW/%dL, +%d -%d = %+d'
-      dat = [
-        player, side,
-        stats['wins'].to_i, stats['losses'].to_i,
-        stats['defense_wins'].to_i, stats['defense_losses'].to_i,
-        dealt, taken, dealt - taken,
-      ]
-      m.reply(s % dat)
+    unless id
+      m.reply(player + ' not found')
+      return
+    end
+    stats = us.find { |x| x['user_id'].to_i == id.to_i }
+    side = stats ? us_name : them_name
+    stats ||= them.find { |x| x['user_id'].to_i == id.to_i }
+    unless stats
+      m.reply(player + ' has not participated in this war')
       return
     end
 
+    dealt = stats['points'].to_i
+    taken = stats['points_against'].to_i
+
+    s = '%s (%s): Attack %dW/%dL, Defense %dW/%dL, +%d -%d = %+d'
+    dat = [
+      player, side,
+      stats['wins'].to_i, stats['losses'].to_i,
+      stats['defense_wins'].to_i, stats['defense_losses'].to_i,
+      dealt, taken, dealt - taken,
+    ]
+    m.reply(s % dat)
+    return
+  end
+
+  def warstats_counts(m, us, them, verbosity)
     # Hacktacular since war_report doesn't work with :both, doh!
     # I only want to make one request,
     # so I'll use war_rankings and Playerize manually
@@ -190,4 +194,5 @@ module Cinch; module Plugins; class TyrantWar
     counts = ::Tyrant.war_counts(usp, themp)
     m.reply(::Tyrant::STATS_FMT[verbosity] % counts)
   end
+
 end; end; end
