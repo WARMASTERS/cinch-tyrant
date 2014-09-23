@@ -23,16 +23,7 @@ describe Cinch::Plugins::TyrantHistory do
 
   it 'shows old wars' do
     @conn.respond('getOldFactionWars', '', {'wars' => [
-      {
-        'faction_war_id' => '1',
-        'name' => 'THE ENEMY',
-        'attacker_faction_id' => '1000',
-        'defender_faction_id' => '1001',
-        'start_time' => Time.now.to_i.to_s,
-        'duration' => '6',
-        'atk_pts' => '0',
-        'def_pts' => '0',
-      },
+      make_war(1),
     ]})
 
     msg = make_message(bot, '!last', channel: '#test')
@@ -47,16 +38,7 @@ describe Cinch::Plugins::TyrantHistory do
 
     before :each do
       @conn.respond('getOldFactionWars', '', {'wars' => [
-        {
-          'faction_war_id' => '1',
-          'name' => 'THE ENEMY',
-          'attacker_faction_id' => '1000',
-          'defender_faction_id' => '1001',
-          'start_time' => Time.now.to_i.to_s,
-          'duration' => '6',
-          'atk_pts' => '0',
-          'def_pts' => '0',
-        },
+        make_war(1),
       ]})
     end
 

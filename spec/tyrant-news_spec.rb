@@ -27,16 +27,7 @@ describe Cinch::Plugins::TyrantNews do
     @chan = FakeChannel.new
     bot.plugins[0].stub(:Channel) { |n| @chan }
     wars = { 'wars' => {
-      '1' => {
-        'faction_war_id' => '1',
-        'name' => 'THE ENEMY',
-        'attacker_faction_id' => '1000',
-        'defender_faction_id' => '1001',
-        'start_time' => Time.now.to_i.to_s,
-        'duration' => '6',
-        'atk_pts' => '0',
-        'def_pts' => '0',
-      },
+      '1' => make_war(1),
     }}
     @conn.respond('getActiveFactionWars', '', wars)
     bot.plugins[0].get_timers[0].fire!
@@ -50,16 +41,7 @@ describe Cinch::Plugins::TyrantNews do
     @chan = FakeChannel.new
     bot.plugins[0].stub(:Channel) { |n| @chan }
     wars = { 'wars' => {
-      '1' => {
-        'faction_war_id' => '1',
-        'name' => 'THE ENEMY',
-        'attacker_faction_id' => '1001',
-        'defender_faction_id' => '1000',
-        'start_time' => Time.now.to_i.to_s,
-        'duration' => '6',
-        'atk_pts' => '0',
-        'def_pts' => '0',
-      },
+      '1' => make_war(1, type: :defense),
     }}
     @conn.respond('getActiveFactionWars', '', wars)
     bot.plugins[0].get_timers[0].fire!

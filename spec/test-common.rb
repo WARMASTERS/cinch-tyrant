@@ -166,6 +166,21 @@ class FakeConnection
   end
 end
 
+# =================== WARS ===================
+
+def make_war(id, type: :offense)
+  return {
+    'faction_war_id' => id.to_s,
+    'name' => 'THE ENEMY',
+    'attacker_faction_id' => type == :defense ? '1001' : '1000',
+    'defender_faction_id' => type == :defense ? '1000' : '1001',
+    'start_time' => Time.now.to_i.to_s,
+    'duration' => '6',
+    'atk_pts' => '0',
+    'def_pts' => '0',
+  }
+end
+
 # =================== CONQUEST ===================
 
 def make_tile(id, owner_id = nil, attacker_id = nil, cr: 1, x: 0, y: 0)

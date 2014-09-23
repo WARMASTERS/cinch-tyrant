@@ -32,16 +32,7 @@ describe Cinch::Plugins::TyrantWar do
 
     it 'shows wars' do
       @conn.respond('getActiveFactionWars', '', {'wars' => {
-        '1' => {
-          'faction_war_id' => '1',
-          'name' => 'THE ENEMY',
-          'attacker_faction_id' => '1000',
-          'defender_faction_id' => '1001',
-          'start_time' => Time.now.to_i.to_s,
-          'duration' => '6',
-          'atk_pts' => '0',
-          'def_pts' => '0',
-        },
+        '1' => make_war(1),
       }})
       replies = get_replies_text(message)
       expect(replies.shift).to be =~
@@ -62,16 +53,7 @@ describe Cinch::Plugins::TyrantWar do
     # TODO: If ID is invalid?
 
     it 'shows war stats' do
-      @conn.respond('getFactionWarInfo', 'faction_war_id=1', {
-        'faction_war_id' => '1',
-        'name' => 'THE ENEMY',
-        'attacker_faction_id' => '1000',
-        'defender_faction_id' => '1001',
-        'start_time' => Time.now.to_i.to_s,
-        'duration' => '6',
-        'atk_pts' => '0',
-        'def_pts' => '0',
-      })
+      @conn.respond('getFactionWarInfo', 'faction_war_id=1', make_war(1))
       @conn.respond('getOldFactionWars', '', {'wars' => {
       }})
       @conn.respond('getFactionWarRankings', 'faction_war_id=1', {'rankings' => {
