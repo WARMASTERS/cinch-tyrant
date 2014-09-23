@@ -52,10 +52,24 @@ describe Cinch::Plugins::TyrantWar do
 
     # TODO: If ID is invalid?
 
-    it 'shows war stats' do
+    it 'shows war stats for a current war' do
       @conn.respond('getFactionWarInfo', 'faction_war_id=1', make_war(1))
-      @conn.respond('getOldFactionWars', '', {'wars' => {
+      @conn.respond('getOldFactionWars', '', {'wars' => []})
+      @conn.respond('getFactionWarRankings', 'faction_war_id=1', {'rankings' => {
+        '1000' => {},
+        '1001' => {},
       }})
+      replies = get_replies_text(message)
+      expect(replies.shift).to be =~
+        /^\s*1 - faction 1000 vs THE ENEMY 0-0 \(\+0\) \d\d:\d\d:\d\d left$/
+      # TODO: eh, somewhat better checking
+      expect(replies.shift).to be =~ /Active players/
+      expect(replies).to be == []
+    end
+
+    it 'shows war stats for an ended war' do
+      @conn.respond('getFactionWarInfo', 'faction_war_id=1', make_war(1))
+      @conn.respond('getOldFactionWars', '', {'wars' => [make_war(1)]})
       @conn.respond('getFactionWarRankings', 'faction_war_id=1', {'rankings' => {
         '1000' => {},
         '1001' => {},
