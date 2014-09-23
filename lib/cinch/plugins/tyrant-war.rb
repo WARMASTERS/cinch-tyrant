@@ -100,6 +100,10 @@ module Cinch; module Plugins; class TyrantWar
       json, _ = @info_cache.lookup(war_id, 15, tolerate_exceptions: true) {
         tyrant.make_request('getFactionWarInfo', "faction_war_id=#{war_id}")
       }
+      if !json || json['result'] == false
+        m.reply('Invalid war ' + war_id.to_s)
+        return
+      end
       m.reply(tyrant.format_wars([json]))
       opponent_name ||= json['name']
     end
@@ -134,7 +138,7 @@ module Cinch; module Plugins; class TyrantWar
       }
     end
 
-    if not json
+    if !json || json['result'] == false
       m.reply('Invalid war ' + war_id.to_s)
       return
     end
