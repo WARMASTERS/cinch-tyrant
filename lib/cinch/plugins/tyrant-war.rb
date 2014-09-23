@@ -93,6 +93,13 @@ module Cinch; module Plugins; class TyrantWar
     user = BOT_CHANNELS[m.channel.name].player
     tyrant = Tyrants.get(user)
 
+    if show_score
+      json, _ = @info_cache.lookup(war_id, 15, tolerate_exceptions: true) {
+        tyrant.make_request('getFactionWarInfo', "faction_war_id=#{war_id}")
+      }
+      m.reply(tyrant.format_wars([json]))
+    end
+
     # We want to cache the wars that have ended.
     # Unfortunately, getFactionWarRankings does not tell us!
     # So, we use old_wars (cached) to build a set of wars that we know
@@ -173,14 +180,6 @@ module Cinch; module Plugins; class TyrantWar
     themp = them.map { |p| x = ::Tyrant::Player.new(0, ''); x.add_war(p); x }
 
     counts = ::Tyrant.war_counts(usp, themp)
-
-    if show_score
-      json, _ = @info_cache.lookup(war_id, 15, tolerate_exceptions: true) {
-        tyrant.make_request('getFactionWarInfo', "faction_war_id=#{war_id}")
-      }
-      m.reply(tyrant.format_wars([json]))
-    end
-
     m.reply(::Tyrant::STATS_FMT[verbosity] % counts)
   end
 end; end; end
