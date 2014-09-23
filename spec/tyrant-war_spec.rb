@@ -83,7 +83,31 @@ describe Cinch::Plugins::TyrantWar do
     end
   end
 
+  describe '!war -v <id>' do
+    before :each do
+      @conn = FakeConnection.new
+      @tyrant = Tyrants.get_fake('testplayer', @conn)
+      expect(Tyrants).to receive(:get).with('testplayer').and_return(@tyrant)
+    end
+
+    let(:message) { make_message(bot, '!war -v 1', channel: '#test') }
+
+    it 'shows war stats for a current war' do
+      @conn.respond('getFactionWarInfo', 'faction_war_id=1', make_war(1))
+      @conn.respond('getOldFactionWars', '', {'wars' => []})
+      @conn.respond('getFactionWarRankings', 'faction_war_id=1', {'rankings' => {
+        '1000' => {},
+        '1001' => {},
+      }})
+      replies = get_replies_text(message)
+      expect(replies.shift).to be =~
+        /^\s*1 - faction 1000 vs THE ENEMY 0-0 \(\+0\) \d\d:\d\d:\d\d left$/
+      # TODO: eh, somewhat better checking
+      expect(replies.shift).to be =~ /Inactive players/
+      expect(replies).to be == []
+    end
+  end
+
   # TODO: !war <id> <player>
-  # TODO: !war -v <id>
   # TODO: !ws
 end
