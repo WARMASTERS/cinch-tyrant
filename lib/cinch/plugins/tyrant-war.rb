@@ -82,12 +82,15 @@ module Cinch; module Plugins; class TyrantWar
       if wars.size == 1
         verbosity = verbose.nil? ? 0 : 1
         id = wars[0]['faction_war_id']
-        warstats(m, id, player, verbosity, show_score: false)
+        opponent = wars[0]['name']
+        warstats(m, id, player, verbosity,
+                 show_score: false, opponent_name: opponent)
       end
     end
   end
 
-  def warstats(m, war_id, player, verbosity, show_score: true)
+  def warstats(m, war_id, player, verbosity,
+               show_score: true, opponent_name: nil)
     return unless is_member?(m)
 
     user = BOT_CHANNELS[m.channel.name].player
@@ -98,6 +101,7 @@ module Cinch; module Plugins; class TyrantWar
         tyrant.make_request('getFactionWarInfo', "faction_war_id=#{war_id}")
       }
       m.reply(tyrant.format_wars([json]))
+      opponent_name ||= json['name']
     end
 
     # We want to cache the wars that have ended.
@@ -151,7 +155,7 @@ module Cinch; module Plugins; class TyrantWar
         return
       end
       stats = us.find { |x| x['user_id'].to_i == id.to_i }
-      side = stats ? tyrant.faction_name : 'Opponent'
+      side = stats ? tyrant.faction_name : (opponent_name || 'Opponent')
       stats ||= them.find { |x| x['user_id'].to_i == id.to_i }
       unless stats
         m.reply(player + ' has not participated in this war')
