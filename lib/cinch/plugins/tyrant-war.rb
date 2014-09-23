@@ -108,17 +108,34 @@ module Cinch; module Plugins; class TyrantWar
       opponent_name ||= json['name']
     end
 
+    json = rankings(tyrant, war_id)
+    if !json || json['result'] == false
+      m.reply('Invalid war ' + war_id.to_s)
+      return
+    end
+
+    other = json.keys.select { |k| k != tyrant.faction_id.to_s }[0]
+    us = json[tyrant.faction_id.to_s]
+    them = json[other]
+
+    if player
+      warstats_player(m, player, tyrant.faction_name, us, opponent_name, them)
+    else
+      warstats_counts(m, us, them, verbosity)
+    end
+  end
+
+  def rankings(tyrant, war_id)
     # We want to cache the wars that have ended.
     # Unfortunately, getFactionWarRankings does not tell us!
     # So, we use old_wars (cached) to build a set of wars that we know
     # have ended already.
 
     suffix = war_id[-3..-1].to_i
-    old_wars = tyrant.old_wars(nil)
 
     # This war is not known to be ended. Update the known_ended_wars.
     if @known_ended_wars[suffix] < war_id.to_i
-      old_wars.each { |w|
+      tyrant.old_wars(nil).each { |w|
         this_id = w['faction_war_id'].to_i
         this_suffix = w['faction_war_id'][-3..-1].to_i
         if @known_ended_wars[this_suffix] < this_id
@@ -138,20 +155,7 @@ module Cinch; module Plugins; class TyrantWar
       }
     end
 
-    if !json || json['result'] == false
-      m.reply('Invalid war ' + war_id.to_s)
-      return
-    end
-
-    other = json.keys.select { |k| k != tyrant.faction_id.to_s }[0]
-    us = json[tyrant.faction_id.to_s]
-    them = json[other]
-
-    if player
-      warstats_player(m, player, tyrant.faction_name, us, opponent_name, them)
-    else
-      warstats_counts(m, us, them, verbosity)
-    end
+    return json
   end
 
   def warstats_player(m, player, us_name, us, them_name, them)
