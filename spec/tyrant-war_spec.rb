@@ -93,7 +93,75 @@ describe Cinch::Plugins::TyrantWar do
     end
   end
 
-  # TODO: !war <id> <player>
+  describe '!war <id> <player> with invalid player' do
+    let(:message) { make_message(bot, '!war 1 joecool', channel: '#test') }
+    before :each do
+      expect(Tyrant).to receive(:id_of_name).with('joecool').and_return(nil)
+    end
+
+    it 'displays the war, then says player not found' do
+      @conn.respond('getFactionWarInfo', 'faction_war_id=1', make_war(1))
+      @conn.respond('getOldFactionWars', '', {'wars' => []})
+      @conn.respond('getFactionWarRankings', 'faction_war_id=1', {'rankings' => {
+        '1000' => {},
+        '1001' => {},
+      }})
+      replies = get_replies_text(message)
+      expect(replies.shift).to be =~
+        /^\s*1 - faction 1000 vs THE ENEMY 0-0 \(\+0\) \d\d:\d\d:\d\d left$/
+      expect(replies).to be == ['joecool not found']
+    end
+  end
+
+  describe '!war <id> <player>' do
+    let(:message) { make_message(bot, '!war 1 joecool', channel: '#test') }
+    before :each do
+      expect(Tyrant).to receive(:id_of_name).with('joecool').and_return(47)
+    end
+
+    it 'says when player has not participated' do
+      @conn.respond('getFactionWarInfo', 'faction_war_id=1', make_war(1))
+      @conn.respond('getOldFactionWars', '', {'wars' => []})
+      @conn.respond('getFactionWarRankings', 'faction_war_id=1', {'rankings' => {
+        '1000' => {},
+        '1001' => {},
+      }})
+      replies = get_replies_text(message)
+      expect(replies.shift).to be =~
+        /^\s*1 - faction 1000 vs THE ENEMY 0-0 \(\+0\) \d\d:\d\d:\d\d left$/
+      expect(replies).to be == ['joecool has not participated in this war']
+    end
+
+    it 'says when player is in faction' do
+      @conn.respond('getFactionWarInfo', 'faction_war_id=1', make_war(1))
+      @conn.respond('getOldFactionWars', '', {'wars' => []})
+      @conn.respond('getFactionWarRankings', 'faction_war_id=1', {'rankings' => {
+        '1000' => [make_war_ranking(47, 1, 0, 45, 2)],
+        '1001' => {},
+      }})
+      replies = get_replies_text(message)
+      expect(replies.shift).to be =~
+        /^\s*1 - faction 1000 vs THE ENEMY 0-0 \(\+0\) \d\d:\d\d:\d\d left$/
+      expect(replies).to be == [
+        'joecool (faction 1000): Attack 1W/0L, Defense 0W/0L, +45 -2 = +43'
+      ]
+    end
+
+    it 'says when player is opponent' do
+      @conn.respond('getFactionWarInfo', 'faction_war_id=1', make_war(1))
+      @conn.respond('getOldFactionWars', '', {'wars' => []})
+      @conn.respond('getFactionWarRankings', 'faction_war_id=1', {'rankings' => {
+        '1000' => {},
+        '1001' => [make_war_ranking(47, 1, 0, 45, 2)],
+      }})
+      replies = get_replies_text(message)
+      expect(replies.shift).to be =~
+        /^\s*1 - faction 1000 vs THE ENEMY 0-0 \(\+0\) \d\d:\d\d:\d\d left$/
+      expect(replies).to be == [
+        'joecool (THE ENEMY): Attack 1W/0L, Defense 0W/0L, +45 -2 = +43'
+      ]
+    end
+  end
 
   shared_examples '!ws command' do
     context 'when faction is in no wars' do

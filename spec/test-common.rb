@@ -181,6 +181,19 @@ def make_war(id, type: :offense)
   }
 end
 
+def make_war_ranking(id, wins, losses, dealt, taken)
+  return {
+    'user_id' => id.to_s,
+    'wins' => wins.to_s,
+    'losses' => losses.to_s,
+    'points' => dealt.to_s,
+    'points_against' => taken.to_s,
+    'battles_fought' => (wins + losses).to_s,
+    'defense_wins' => '0',
+    'defense_losses' => '0',
+  }
+end
+
 # =================== CONQUEST ===================
 
 def make_tile(id, owner_id = nil, attacker_id = nil, cr: 1, x: 0, y: 0)
