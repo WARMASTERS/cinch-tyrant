@@ -10,6 +10,7 @@ describe Cinch::Plugins::TyrantWar do
       self.loggers.stub('debug') { nil }
     }
   }
+  let(:plugin) { bot.plugins.first }
 
   before :each do
     @conn = FakeConnection.new
@@ -93,5 +94,82 @@ describe Cinch::Plugins::TyrantWar do
   end
 
   # TODO: !war <id> <player>
-  # TODO: !ws
+
+  shared_examples '!ws command' do
+    context 'when faction is in no wars' do
+      before :each do
+        @conn.respond('getActiveFactionWars', '', {'wars' => {}})
+      end
+
+      it 'shows no wars' do
+        allow(plugin).to receive(:warstats)
+        replies = get_replies_text(message)
+        expect(replies).to be == ['No wars!']
+      end
+    end
+
+    context 'when faction is in one war' do
+      before :each do
+        @war = make_war(1)
+        @conn.respond('getActiveFactionWars', '', {'wars' => {
+          '1' => @war,
+        }})
+      end
+
+      it 'shows wars' do
+        allow(plugin).to receive(:warstats)
+        replies = get_replies_text(message)
+        expect(replies.shift).to be =~
+          /^\s*1 - faction 1000 vs THE ENEMY 0-0 \(\+0\) \d\d:\d\d:\d\d left$/
+      end
+
+      it 'shows stats' do
+        expect(plugin).to receive(:warstats).with(anything, '1', player, 0, {
+          :show_score => false, :opponent_name => @war['name'],
+        })
+        get_replies(message)
+      end
+    end
+
+    context 'when faction is in multiple wars' do
+      before :each do
+        @war1 = make_war(1)
+        @war2 = make_war(2)
+        @conn.respond('getActiveFactionWars', '', {'wars' => {
+          '1' => @war1,
+          '2' => @war2,
+        }})
+      end
+
+      it 'shows wars' do
+        replies = get_replies_text(message)
+        expect(replies.shift).to be =~ /More than one war/
+        wars = replies.shift
+        expect(wars).to be =~
+          /^\s*1 - faction 1000 vs THE ENEMY 0-0 \(\+0\) \d\d:\d\d:\d\d left$/
+        expect(wars).to be =~
+          /^\s*2 - faction 1000 vs THE ENEMY 0-0 \(\+0\) \d\d:\d\d:\d\d left$/
+        expect(replies).to be == []
+      end
+
+      it 'does not show stats' do
+        expect(plugin).to_not receive(:warstats)
+        get_replies(message)
+      end
+    end
+  end
+
+  describe '!ws' do
+    let(:message) { make_message(bot, '!ws', channel: '#test') }
+    let(:player) { nil }
+
+    it_behaves_like '!ws command'
+  end
+
+  describe '!ws <player>' do
+    let(:message) { make_message(bot, '!ws joecool', channel: '#test') }
+    let(:player) { 'joecool' }
+
+    it_behaves_like '!ws command'
+  end
 end
