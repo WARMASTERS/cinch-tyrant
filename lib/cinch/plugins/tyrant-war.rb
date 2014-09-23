@@ -144,6 +144,7 @@ module Cinch; module Plugins; class TyrantWar
         return
       end
       stats = us.find { |x| x['user_id'].to_i == id.to_i }
+      side = stats ? tyrant.faction_name : 'Opponent'
       stats ||= them.find { |x| x['user_id'].to_i == id.to_i }
       unless stats
         m.reply(player + ' has not participated in this war')
@@ -153,9 +154,9 @@ module Cinch; module Plugins; class TyrantWar
       dealt = stats['points'].to_i
       taken = stats['points_against'].to_i
 
-      s = '%s: Attack %dW/%dL, Defense %dW/%dL, +%d -%d = %+d'
+      s = '%s (%s): Attack %dW/%dL, Defense %dW/%dL, +%d -%d = %+d'
       dat = [
-        player,
+        player, side,
         stats['wins'].to_i, stats['losses'].to_i,
         stats['defense_wins'].to_i, stats['defense_losses'].to_i,
         dealt, taken, dealt - taken,
