@@ -11,17 +11,13 @@ describe Cinch::Plugins::TyrantWar do
     }
   }
 
-  it 'makes a test bot' do
-    expect(bot).to be_a Cinch::Bot
+  before :each do
+    @conn = FakeConnection.new
+    @tyrant = Tyrants.get_fake('testplayer', @conn)
+    expect(Tyrants).to receive(:get).with('testplayer').and_return(@tyrant)
   end
 
   describe '!war' do
-    before :each do
-      @conn = FakeConnection.new
-      @tyrant = Tyrants.get_fake('testplayer', @conn)
-      expect(Tyrants).to receive(:get).with('testplayer').and_return(@tyrant)
-    end
-
     let(:message) { make_message(bot, '!war', channel: '#test') }
 
     it 'informs the user when there are no wars' do
@@ -42,12 +38,6 @@ describe Cinch::Plugins::TyrantWar do
   end
 
   describe '!war <id>' do
-    before :each do
-      @conn = FakeConnection.new
-      @tyrant = Tyrants.get_fake('testplayer', @conn)
-      expect(Tyrants).to receive(:get).with('testplayer').and_return(@tyrant)
-    end
-
     let(:message) { make_message(bot, '!war 1', channel: '#test') }
 
     # TODO: If ID is invalid?
@@ -84,12 +74,6 @@ describe Cinch::Plugins::TyrantWar do
   end
 
   describe '!war -v <id>' do
-    before :each do
-      @conn = FakeConnection.new
-      @tyrant = Tyrants.get_fake('testplayer', @conn)
-      expect(Tyrants).to receive(:get).with('testplayer').and_return(@tyrant)
-    end
-
     let(:message) { make_message(bot, '!war -v 1', channel: '#test') }
 
     it 'shows war stats for a current war' do
