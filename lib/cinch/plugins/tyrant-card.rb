@@ -123,9 +123,9 @@ module Cinch; module Plugins; class TyrantCard
     return unless is_friend?(m)
 
     if !card_list.include?(',')
-      deck, invalid = ::Tyrant::Cards::unhash(card_list.strip)
+      deck, invalid = ::Tyrant::Cards::unhash(card_list.strip, @cards_by_id)
       if invalid.empty?
-        all_valid = deck.all? { |id, _| @cards_by_id.has_key?(id) }
+        all_valid = deck.all? { |id, _| @cards_by_id.has_key?(id % 10000) }
         return unhash(m, card_list) if all_valid
       end
     end
@@ -221,11 +221,12 @@ module Cinch; module Plugins; class TyrantCard
       return
     end
 
-    deck, invalid = ::Tyrant::Cards::unhash(hash)
+    deck, invalid = ::Tyrant::Cards::unhash(hash, @cards_by_id)
 
     deck.map! { |id, count|
-      card = @cards_by_id[id]
+      card = @cards_by_id[id % 10000]
       name = card ? card.name : "Unknown card #{id}"
+      name = "FOIL #{name}" if id >= 10000
       count > 1 ? "#{name} ##{count}" : name
     }
 
