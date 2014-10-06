@@ -17,6 +17,8 @@ module Cinch; module Plugins; class TyrantPlayer
     '4' => 'Warmaster',
   }
 
+  WAIT_TIME = 600
+
   # If a name lookup fails, we try to find the closest name in the faction.
   # This is the threshold (inclusive) for closeness for such a name to be valid.
   NAME_CLOSE_THRESH = 6
@@ -230,6 +232,12 @@ module Cinch; module Plugins; class TyrantPlayer
     # To trigger, must be me and PM, or in an allowed channel
     return if !m.channel && !m.user.master?
     return if m.channel && !is_friend?(m)
+
+    if m.user.signed_on_at.to_i + WAIT_TIME > Time.now.to_i
+      m.reply('STAY A WHILE AND LISTEN! ' +
+              'It is very rude to ask for info right after signing on.', true)
+      return
+    end
 
     days = self.class.limit_days(days)
     show_ids = verbose && m.user.master?

@@ -25,6 +25,7 @@ describe Cinch::Plugins::TyrantPlayer do
     let(:message) { make_message(bot, '!player joecool', channel: '#test') }
 
     before :each do
+      allow(message.user).to receive(:signed_on_at).and_return(0)
       expect(Tyrant).to receive(:id_of_name).with('joecool').and_return(47)
     end
 
