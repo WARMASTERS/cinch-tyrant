@@ -9,6 +9,8 @@ require 'yaml'
 module Cinch; module Plugins; class TyrantFaction
   include Cinch::Plugin
 
+  WAIT_TIME = 600
+
   def initialize(*args)
     super
     file = config[:yaml_file] || ''
@@ -92,6 +94,12 @@ module Cinch; module Plugins; class TyrantFaction
     # To trigger, must be me and PM, or in an allowed channel
     return if !m.channel && !m.user.master?
     return if m.channel && !is_friend?(m)
+
+    if m.user.signed_on_at.to_i + WAIT_TIME > Time.now.to_i
+      m.reply('STAY A WHILE AND LISTEN! ' +
+              'It is very rude to ask for info right after signing on.', true)
+      return
+    end
 
     last_fail = m.channel && @failures[m.channel.name]
     if faction_name && last_fail == faction_name && !m.user.master?

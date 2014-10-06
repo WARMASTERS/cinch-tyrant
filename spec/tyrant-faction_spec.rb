@@ -43,6 +43,7 @@ describe Cinch::Plugins::TyrantFaction do
         'faction_id' => '1000',
         'name' => 'myfaction',
       }))
+      allow(message.user).to receive(:signed_on_at).and_return(0)
     end
 
     it 'displays information of own faction' do
@@ -74,6 +75,7 @@ describe Cinch::Plugins::TyrantFaction do
     let(:faction_id) { 9001 }
 
     it 'shows faction info' do
+      allow(message.user).to receive(:signed_on_at).and_return(0)
       expect(@tyrant).to receive(:faction_data).with(9001).and_return(make_faction)
       expect(get_replies_text(message)).to be == [
         'testfaction: 4 members (50% active), Level 19, 700 FP, 1337/7331 W/L, 5 CR, 2 tiles'
@@ -81,6 +83,7 @@ describe Cinch::Plugins::TyrantFaction do
     end
 
     it 'reports if faction could not be joined' do
+      allow(message.user).to receive(:signed_on_at).and_return(0)
       expect(@tyrant).to receive(:faction_data).with(9001).and_return({
         'result' => false,
       })
@@ -104,6 +107,7 @@ describe Cinch::Plugins::TyrantFaction do
       context 'with a master' do
         before :each do
           message.user.stub(:master?).and_return(true)
+          allow(message.user).to receive(:signed_on_at).and_return(0)
         end
 
         it 'shows conquest attacks' do
@@ -117,6 +121,7 @@ describe Cinch::Plugins::TyrantFaction do
       context 'with a normal user' do
         before :each do
           message.user.stub(:master?).and_return(false)
+          allow(message.user).to receive(:signed_on_at).and_return(0)
         end
 
         it 'does not show conquest attacks' do
@@ -146,6 +151,7 @@ describe Cinch::Plugins::TyrantFaction do
       context 'with a master' do
         before :each do
           message.user.stub(:master?).and_return(true)
+          allow(message.user).to receive(:signed_on_at).and_return(0)
         end
 
         it 'shows conquest attacks' do
@@ -159,6 +165,7 @@ describe Cinch::Plugins::TyrantFaction do
       context 'with a normal user' do
         before :each do
           message.user.stub(:master?).and_return(false)
+          allow(message.user).to receive(:signed_on_at).and_return(0)
         end
 
         it 'shows conquest attacks' do
