@@ -111,6 +111,12 @@ BOT_PLUGIN_OPTIONS = {
     :channels => {
       '#example' => [true, 30],
     },
+    # Hash[channel_name => [string]]. If this is present for a channel, messages
+    # are only sent to that channel if they contain (case-insensitive) a string
+    # appearing in the list for that channel.
+    :filters => {
+      '#example' => ['required'],
+    }
   },
   Cinch::Plugins::TyrantMission => {
     # How many results can be displayed before bot instead says "Maybe you

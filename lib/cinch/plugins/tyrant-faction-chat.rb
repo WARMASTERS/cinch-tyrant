@@ -68,7 +68,11 @@ module Cinch; module Plugins; class TyrantFactionChat < TyrantPoll
 
       text = ::Tyrant::sanitize_or_default(m['message'], 'nil')
       msg = "[FACTION] #{user}: #{text}"
-      channels.each { |c| Channel(c).send(msg) }
+      channels.each { |c|
+        filters = (config[:filters] || {})[c]
+        next if filters && !filters.any? { |f| text.downcase.include?(f) }
+        Channel(c).send(msg)
+      }
 
       if (match = registration_regex.match(m['message']))
         # TODO: Have this update the cache?

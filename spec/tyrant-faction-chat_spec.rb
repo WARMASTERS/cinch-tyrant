@@ -5,8 +5,11 @@ require 'cinch/plugins/tyrant-faction-chat'
 describe Cinch::Plugins::TyrantFactionChat do
   include Cinch::Test
 
+  let(:config) {{
+  }}
+
   let(:bot) {
-    make_bot(Cinch::Plugins::TyrantFactionChat) { |c|
+    make_bot(Cinch::Plugins::TyrantFactionChat, config) { |c|
       self.loggers.stub('debug') { nil }
     }
   }
@@ -89,6 +92,29 @@ describe Cinch::Plugins::TyrantFactionChat do
     ]}
 
     it_behaves_like 'posting two messages in the right order'
+  end
+
+  context 'with filters' do
+    let(:config) {{
+      :filters => { '#test' => ['required', 'words'] }
+    }}
+
+    before :each do
+      @conn.respond('getNewFactionMessages', 'last_post=60', {'messages' => [
+        {'post_id' => '61', 'message' => 'non', 'user_id' => '2'},
+        {'post_id' => '62', 'message' => 'required', 'user_id' => '2'},
+        {'post_id' => '63', 'message' => 'words here', 'user_id' => '2'},
+      ]})
+      allow(Tyrant).to receive(:name_of_id).with('2').and_return('usertwo')
+      bot.plugins[0].get_timers[0].fire!
+    end
+
+    it 'posts only messages that match a filter' do
+      expect(@chan.messages).to be == [
+        '[FACTION] usertwo: required',
+        '[FACTION] usertwo: words here',
+      ]
+    end
   end
 
   # TODO: !chat (on|off)
