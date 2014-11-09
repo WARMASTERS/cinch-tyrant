@@ -111,7 +111,9 @@ module Cinch; module Plugins; class TyrantTargets
     # This code path is only making this req and maybe an our_info req.
     old_wars = tyrant.old_wars(1, cache: false)
     attack_wars = old_wars.select { |w|
-      w['attacker_faction_id'].to_i == tyrant.faction_id
+      attack = w['attacker_faction_id'].to_i == tyrant.faction_id
+      recent = ::Tyrant::decreased_fp(w['start_time'].to_i)
+      attack && recent
     }
     defenders = attack_wars.map { |w| w['defender_faction_id'].to_i }
 
