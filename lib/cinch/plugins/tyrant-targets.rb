@@ -107,7 +107,9 @@ module Cinch; module Plugins; class TyrantTargets
       return []
     end
 
-    old_wars = tyrant.old_wars(0.75, cache: true)
+    # No-cache, we are rate-limited and want very recent wars.
+    # This code path is only making this req and maybe an our_info req.
+    old_wars = tyrant.old_wars(1, cache: false)
     attack_wars = old_wars.select { |w|
       w['attacker_faction_id'].to_i == tyrant.faction_id
     }
