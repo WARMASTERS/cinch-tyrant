@@ -60,16 +60,14 @@ module Cinch; module Plugins; class TyrantTargets
       @wait_times[m.channel.name] = FLOOD_INITIAL_TIME
     end
 
-    args = (config[:channels] || {})[channel.id] || DEFAULT_CONFIG
-
-    targets, _ = @targets_cache.lookup(tyrant.faction_id, 15) {
-      tyrant.raw_rivals(*args)
-    }
-
-    info, _ = @our_fp_cache.lookup(tyrant.faction_id, 600) {
-      tyrant.make_request('getFactionInfo')
-    }
+    info = our_info(tyrant)
     our_fp = info['rating'] ? info['rating'].to_i : nil
+
+    if config[:request_pipe] && config[:response_pipe]
+      targets = targets_pipe(m, tyrant)
+    else
+      targets = targets_tyrant(m, channel, tyrant)
+    end
 
     if name
       targets = targets.select { |target|
@@ -83,4 +81,54 @@ module Cinch; module Plugins; class TyrantTargets
 
     m.reply(targets.empty? ? 'No targets!' : ::Tyrant.format_rivals(targets))
   end
+
+  def our_info(tyrant)
+    info, _ = @our_fp_cache.lookup(tyrant.faction_id, 600) {
+      tyrant.make_request('getFactionInfo')
+    }
+    return info
+  end
+
+  def targets_pipe(m, tyrant)
+    info = our_info(tyrant)
+    our_level = info['level'] && info['level'].to_i
+
+    output = open(config[:request_pipe], 'w+')
+    args = { 'request_id' => tyrant.faction_id }
+    args['faction_level'] = our_level if our_level
+    output.puts(JSON.dump(args))
+    output.flush
+
+    input = open(config[:response_pipe], 'r+')
+    response = JSON.parse(input.gets)
+    response_id = response['response_id']
+    if response_id != tyrant.faction_id
+      m.reply("Oops, got response for #{response_id}. Try again?", true)
+      return []
+    end
+
+    old_wars = tyrant.old_wars(0.75, cache: true)
+    attack_wars = old_wars.select { |w|
+      w['attacker_faction_id'].to_i == tyrant.faction_id
+    }
+    defenders = attack_wars.map { |w| w['defender_faction_id'].to_i }
+
+    response['targets'].reject! { |t| t['id'] == tyrant.faction_id }
+    response['targets'].each { |t|
+      reduced = defenders.include?(t['id'])
+      t['less_rating_time'] = reduced ? Time.now.to_i : 0
+    }
+    return response['targets']
+  end
+
+  def targets_tyrant(m, channel, tyrant)
+    args = (config[:channels] || {})[channel.id] || DEFAULT_CONFIG
+
+    targets, _ = @targets_cache.lookup(tyrant.faction_id, 15) {
+      tyrant.raw_rivals(*args)
+    }
+
+    return targets
+  end
+
 end; end; end
