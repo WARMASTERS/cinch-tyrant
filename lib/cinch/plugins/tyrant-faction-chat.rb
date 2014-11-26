@@ -61,7 +61,7 @@ module Cinch; module Plugins; class TyrantFactionChat < TyrantPoll
 
   def notify(faction, channels, new_messages)
     return if new_messages.nil?
-    registration_regex = /^#{bot.nick}\s+confirm\s+(\w+)\s+(\w+)$/i
+    registration_regex = /^\s*#{bot.nick}\s+confirm\s+(\w+)\s+(\w+)$/i
 
     new_messages.each { |m|
       user = ::Tyrant::name_of_id(m['user_id'])
