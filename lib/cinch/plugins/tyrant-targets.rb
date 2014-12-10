@@ -16,6 +16,11 @@ module Cinch; module Plugins; class TyrantTargets
       'Shows factions who are currently open to attack. ' +
       'An asterisk denotes reduced FP gain.'
     ),
+    Cinch::Tyrant::Cmd.new('war', 'targets', '<name>',
+      lambda { |m| is_warmaster?(m) },
+      'Shows any targets whose name contains the given name, ' +
+      'even those not currently open to attack.'
+    ),
   ]
 
   FLOOD_INITIAL_TIME = 15
