@@ -25,6 +25,7 @@ module Cinch; module Plugins; class TyrantTargets
 
   FLOOD_INITIAL_TIME = 15
   FLOOD_INCREASE = 2
+  WAIT_TIME = 600
 
   def initialize(*args)
     super
@@ -38,6 +39,14 @@ module Cinch; module Plugins; class TyrantTargets
 
   def execute(m, name)
     return unless is_warmaster?(m)
+
+    if m.user.signed_on_at.to_i + WAIT_TIME > Time.now.to_i
+      m.reply(
+        'STAY A WHILE AND LISTEN! ' +
+        'It is very rude to ask for targets right after signing on.', true
+      )
+      return
+    end
 
     channel = BOT_CHANNELS[m.channel.name]
     user = channel.player

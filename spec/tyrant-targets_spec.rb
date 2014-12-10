@@ -22,6 +22,7 @@ describe Cinch::Plugins::TyrantTargets do
 
   describe '!targets' do
     before :each do
+      allow(message.user).to receive(:signed_on_at).and_return(0)
       expect(Tyrants).to receive(:get).with('testplayer').and_return(@tyrant)
       @conn.respond('getFactionInfo', '', {'rating' => 1000})
     end
@@ -107,7 +108,9 @@ describe Cinch::Plugins::TyrantTargets do
 
   describe 'flood control' do
     def msg
-      make_message(bot, '!targets', channel: '#test')
+      m = make_message(bot, '!targets', channel: '#test')
+      allow(m.user).to receive(:signed_on_at).and_return(0)
+      return m
     end
 
     before :each do
