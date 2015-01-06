@@ -140,9 +140,7 @@ class Tyrants
 end
 
 class FakeConnection
-  def initialize
-    RSpec::Mocks::setup(self)
-  end
+  include RSpec::Mocks::ExampleMethods
 
   def respond(message, params, response)
     regex = req_regex(message)
