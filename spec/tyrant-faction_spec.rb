@@ -8,7 +8,7 @@ describe Cinch::Plugins::TyrantFaction do
   let(:bot) {
     opts = {:checker => 'checker', :yaml_file => 'lolz'}
     make_bot(Cinch::Plugins::TyrantFaction, opts) { |c|
-      self.loggers.stub('debug') { nil }
+      self.loggers.each { |l| l.level = :fatal }
     }
   }
 

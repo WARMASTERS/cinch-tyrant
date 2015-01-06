@@ -7,7 +7,7 @@ describe Cinch::Plugins::TyrantUpdate do
 
   let(:bot) {
     make_bot(Cinch::Plugins::TyrantUpdate) { |c|
-      self.loggers.stub('debug') { nil }
+      self.loggers.each { |l| l.level = :fatal }
     }
   }
 

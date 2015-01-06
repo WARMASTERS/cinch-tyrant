@@ -16,7 +16,7 @@ describe Cinch::Plugins::TyrantStats do
       :password_dir => '/tmp/tyrant/stats_passwords',
     }
     make_bot(Cinch::Plugins::TyrantStats, opts) { |c|
-      self.loggers.stub('debug') { nil }
+      self.loggers.each { |l| l.level = :fatal }
     }
   }
 

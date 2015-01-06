@@ -11,7 +11,7 @@ describe Cinch::Plugins::TyrantMission do
       :max_matches => 2,
     }
     make_bot(Cinch::Plugins::TyrantMission, opts) { |c|
-      self.loggers.stub('debug') { nil }
+      self.loggers.each { |l| l.level = :fatal }
     }
   }
 

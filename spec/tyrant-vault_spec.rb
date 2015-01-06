@@ -7,7 +7,7 @@ describe Cinch::Plugins::TyrantVault do
 
   let(:bot) {
     make_bot(Cinch::Plugins::TyrantVault, {:checker => 'testplayer'}) { |c|
-      self.loggers.stub('debug') { nil }
+      self.loggers.each { |l| l.level = :fatal }
     }
   }
   let(:plugin) { bot.plugins.first }

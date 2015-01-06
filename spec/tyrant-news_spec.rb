@@ -8,7 +8,7 @@ describe Cinch::Plugins::TyrantNews do
 
   let(:bot) {
     make_bot(Cinch::Plugins::TyrantNews) { |c|
-      self.loggers.stub('debug') { nil }
+      self.loggers.each { |l| l.level = :fatal }
     }
   }
 

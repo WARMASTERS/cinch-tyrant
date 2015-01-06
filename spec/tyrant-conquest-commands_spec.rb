@@ -7,7 +7,7 @@ describe Cinch::Plugins::TyrantConquestCommands do
 
   let(:bot) {
     make_bot(Cinch::Plugins::TyrantConquestCommands) { |c|
-      self.loggers.stub('debug') { nil }
+      self.loggers.each { |l| l.level = :fatal }
     }
   }
 

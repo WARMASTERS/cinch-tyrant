@@ -7,7 +7,7 @@ describe Cinch::Plugins::TyrantRaids do
 
   let(:bot) {
     make_bot(Cinch::Plugins::TyrantRaids, {:checker => 'testplayer'}) { |c|
-      self.loggers.stub('debug') { nil }
+      self.loggers.each { |l| l.level = :fatal }
     }
   }
 

@@ -11,7 +11,7 @@ describe Cinch::Plugins::TyrantConquestPoll do
       :report_channel => '#conquest-news',
     }
     make_bot(Cinch::Plugins::TyrantConquestPoll, opts) { |c|
-      self.loggers.stub('debug') { nil }
+      self.loggers.each { |l| l.level = :fatal }
     }
   }
 

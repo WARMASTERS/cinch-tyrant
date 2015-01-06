@@ -7,7 +7,7 @@ describe Cinch::Plugins::TyrantHistory do
 
   let(:bot) {
     make_bot(Cinch::Plugins::TyrantHistory) { |c|
-      self.loggers.stub('debug') { nil }
+      self.loggers.each { |l| l.level = :fatal }
     }
   }
 

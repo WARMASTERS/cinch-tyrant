@@ -7,7 +7,7 @@ describe Cinch::Plugins::TyrantCard do
 
   let(:bot) {
     make_bot(Cinch::Plugins::TyrantCard, :xml_file => 'testcards.xml') { |c|
-      self.loggers.stub('debug') { nil }
+      self.loggers.each { |l| l.level = :fatal }
     }
   }
 

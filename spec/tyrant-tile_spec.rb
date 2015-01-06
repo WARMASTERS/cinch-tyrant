@@ -7,7 +7,7 @@ describe Cinch::Plugins::TyrantTile do
 
   let(:bot) {
     make_bot(Cinch::Plugins::TyrantTile, {:checker => 'checker'}) { |c|
-      self.loggers.stub('debug') { nil }
+      self.loggers.each { |l| l.level = :fatal }
     }
   }
 
