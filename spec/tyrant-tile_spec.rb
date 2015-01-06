@@ -58,7 +58,7 @@ describe Cinch::Plugins::TyrantTile do
       let(:message) { make_message(bot, '!tile 2', channel: '#test') }
 
       it 'shows tile info' do
-        bot.plugins[0].stub(:shared).and_return({:conquest_map_hash => {
+        allow(bot.plugins[0]).to receive(:shared).and_return({:conquest_map_hash => {
           '1' => make_tile(1, 1000, x: 1, y: 2),
           '2' => make_tile(2, 1001, x: 3, y: 4),
           '3' => make_tile(3, 1002, x: 5, y: 6),
@@ -70,7 +70,7 @@ describe Cinch::Plugins::TyrantTile do
 
     describe 'on my uncontested tile' do
       before :each do
-        bot.plugins[0].stub(:shared).and_return({:conquest_map_hash => {
+        allow(bot.plugins[0]).to receive(:shared).and_return({:conquest_map_hash => {
           '1' => make_tile(1, 1000, x: 1, y: 2),
           '2' => make_tile(2, 1001, x: 3, y: 4),
           '3' => make_tile(3, 1002, x: 5, y: 6),
@@ -109,7 +109,7 @@ describe Cinch::Plugins::TyrantTile do
 
     describe 'on a tile we are defending' do
       before :each do
-        bot.plugins[0].stub(:shared).and_return({:conquest_map_hash => {
+        allow(bot.plugins[0]).to receive(:shared).and_return({:conquest_map_hash => {
           '1' => make_tile(1, 1000, 1001, x: 1, y: 2),
           '2' => make_tile(2, 1001, x: 3, y: 4),
           '3' => make_tile(3, 1002, x: 5, y: 6),
@@ -141,7 +141,7 @@ describe Cinch::Plugins::TyrantTile do
       let(:message) { make_message(bot, '!tile 9001', channel: '#test') }
 
       it 'informs the user' do
-        bot.plugins[0].stub(:shared).and_return({:conquest_map_hash => {
+        allow(bot.plugins[0]).to receive(:shared).and_return({:conquest_map_hash => {
           '1' => make_tile(1, 1000, x: 1, y: 2),
         }})
         expect(get_replies_text(message)).to be == ['Tile 9001 does not exist']

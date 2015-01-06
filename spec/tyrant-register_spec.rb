@@ -24,7 +24,7 @@ describe Cinch::Plugins::TyrantRegister do
     end
 
     it 'stays silent for an unknown user' do
-      bot.plugins[0].stub(:is_friend?).and_return(false)
+      allow(bot.plugins[0]).to receive(:is_friend?).and_return(false)
       replies = get_replies_text(message)
       expect(replies).to be == []
     end

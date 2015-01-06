@@ -15,7 +15,7 @@ describe Cinch::Plugins::TyrantCard do
   let(:card2) { FakeCard.new(2, 'Listen Boy') }
 
   before :each do
-    Cinch::Plugins::TyrantCard.any_instance.stub(:shared).and_return({
+    allow_any_instance_of(Cinch::Plugins::TyrantCard).to receive(:shared).and_return({
       :cards_by_id => {
         1 => card1,
         2 => card2,
@@ -113,7 +113,7 @@ describe Cinch::Plugins::TyrantCard do
     let(:newcard2) { FakeCard.new(2, 'A New Card') }
 
     before :each do
-      message.user.stub(:master?).and_return(true)
+      allow(message.user).to receive(:master?).and_return(true)
       expect(Tyrant::Cards).to receive(:parse_cards).and_return([
         { 1 => newcard1, 2 => newcard2, },
         { 'star war the fourth gathers' => newcard1, 'a new card' => newcard2 },

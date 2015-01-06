@@ -14,7 +14,7 @@ describe Cinch::Plugins::TyrantConquest do
   before :each do
     @conn = FakeConnection.new
     @tyrant = Tyrants.get_fake('testplayer', @conn)
-    Tyrants.stub(:get) { |n|
+    allow(Tyrants).to receive(:get) { |n|
       raise "Who is #{n}?" unless n == 'testplayer'
       @tyrant
     }
@@ -28,7 +28,7 @@ describe Cinch::Plugins::TyrantConquest do
     let(:message) { make_message(bot, '!tiles', channel: '#test') }
 
     it 'shows invasions' do
-      bot.plugins[0].stub(:map_hash).and_return({
+      allow(bot.plugins[0]).to receive(:map_hash).and_return({
         '1' => make_tile(1, 1001, 1000),
         '2' => make_tile(2),
       })
@@ -39,7 +39,7 @@ describe Cinch::Plugins::TyrantConquest do
     end
 
     it 'shows defenses' do
-      bot.plugins[0].stub(:map_hash).and_return({
+      allow(bot.plugins[0]).to receive(:map_hash).and_return({
         '1' => make_tile(1, 1000, 1001),
         '2' => make_tile(2),
       })
@@ -50,7 +50,7 @@ describe Cinch::Plugins::TyrantConquest do
     end
 
     it 'shows uncontested tiles' do
-      bot.plugins[0].stub(:map_hash).and_return({
+      allow(bot.plugins[0]).to receive(:map_hash).and_return({
         '1' => make_tile(1, 1000, cr: 2),
         '2' => make_tile(2),
       })
@@ -61,7 +61,7 @@ describe Cinch::Plugins::TyrantConquest do
     end
 
     it 'informs us if we have no tiles on the map' do
-      bot.plugins[0].stub(:map_hash).and_return({
+      allow(bot.plugins[0]).to receive(:map_hash).and_return({
         '1' => make_tile(1, 1001, cr: 2),
         '2' => make_tile(2),
       })
@@ -76,7 +76,7 @@ describe Cinch::Plugins::TyrantConquest do
     let(:message) { make_message(bot, '!tiles -v', channel: '#test') }
 
     it 'lists uncontested tiles' do
-      bot.plugins[0].stub(:map_hash).and_return({
+      allow(bot.plugins[0]).to receive(:map_hash).and_return({
         '1' => make_tile(1, 1000, cr: 2),
         '2' => make_tile(2),
       })
@@ -91,7 +91,7 @@ describe Cinch::Plugins::TyrantConquest do
     let(:message) { make_message(bot, '!tiles faction 1001', channel: '#test') }
 
     it 'lists tiles of that faction' do
-      bot.plugins[0].stub(:map_hash).and_return({
+      allow(bot.plugins[0]).to receive(:map_hash).and_return({
         '1' => make_tile(1, 1001, cr: 2),
         '2' => make_tile(2),
       })
@@ -102,7 +102,7 @@ describe Cinch::Plugins::TyrantConquest do
     end
 
     it 'lists tiles that faction is attacking' do
-      bot.plugins[0].stub(:map_hash).and_return({
+      allow(bot.plugins[0]).to receive(:map_hash).and_return({
         '1' => make_tile(1, 1000, 1001, cr: 2),
         '2' => make_tile(2),
       })
@@ -113,7 +113,7 @@ describe Cinch::Plugins::TyrantConquest do
     end
 
     it 'complains if no faction with that name exists' do
-      bot.plugins[0].stub(:map_hash).and_return({
+      allow(bot.plugins[0]).to receive(:map_hash).and_return({
         '1' => make_tile(1, 1000, cr: 2),
         '2' => make_tile(2),
       })
@@ -128,7 +128,7 @@ describe Cinch::Plugins::TyrantConquest do
     let(:message) { make_message(bot, '!tiles 1001', channel: '#test') }
 
     it 'lists tiles of that faction' do
-      bot.plugins[0].stub(:map_hash).and_return({
+      allow(bot.plugins[0]).to receive(:map_hash).and_return({
         '1' => make_tile(1, 1001, cr: 2),
         '2' => make_tile(2),
       })
@@ -139,7 +139,7 @@ describe Cinch::Plugins::TyrantConquest do
     end
 
     it 'complains if no faction with that ID exists' do
-      bot.plugins[0].stub(:map_hash).and_return({
+      allow(bot.plugins[0]).to receive(:map_hash).and_return({
         '1' => make_tile(1, 1000, cr: 2),
       })
       replies = get_replies_text(message)
@@ -151,7 +151,7 @@ describe Cinch::Plugins::TyrantConquest do
 
   context 'with ID 0 (neutral tiles)' do
     before :each do
-      bot.plugins[0].stub(:map_hash).and_return({
+      allow(bot.plugins[0]).to receive(:map_hash).and_return({
         '1' => make_tile(1, 1001, cr: 2),
         '2' => make_tile(2, cr: 1),
         '3' => make_tile(3, cr: 3),

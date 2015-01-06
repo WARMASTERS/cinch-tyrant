@@ -22,7 +22,7 @@ describe Cinch::Plugins::TyrantFactionChat do
       {'post_id' => '60', 'message' => 'm1', 'user_id' => '1'},
     ]})
     @chan = FakeChannel.new
-    bot.plugins[0].stub(:Channel).and_return(@chan)
+    allow(bot.plugins[0]).to receive(:Channel).and_return(@chan)
   end
 
   it 'makes a test bot' do

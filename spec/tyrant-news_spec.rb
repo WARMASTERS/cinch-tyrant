@@ -25,7 +25,7 @@ describe Cinch::Plugins::TyrantNews do
 
   it 'informs the channel of a new offensive war' do
     @chan = FakeChannel.new
-    bot.plugins[0].stub(:Channel) { |n| @chan }
+    allow(bot.plugins[0]).to receive(:Channel) { |n| @chan }
     wars = { 'wars' => {
       '1' => make_war(1),
     }}
@@ -39,7 +39,7 @@ describe Cinch::Plugins::TyrantNews do
 
   it 'informs the channel of a new defensive war' do
     @chan = FakeChannel.new
-    bot.plugins[0].stub(:Channel) { |n| @chan }
+    allow(bot.plugins[0]).to receive(:Channel) { |n| @chan }
     wars = { 'wars' => {
       '1' => make_war(1, type: :defense),
     }}
@@ -56,9 +56,9 @@ describe Cinch::Plugins::TyrantNews do
       @chan = FakeChannel.new
       @time = 0
 
-      Time::stub(:now) { Time.at(@time) }
+      allow(Time)::to receive(:now) { Time.at(@time) }
 
-      bot.plugins[0].stub(:Channel) { |n| @chan }
+      allow(bot.plugins[0]).to receive(:Channel) { |n| @chan }
       @war = {
         'faction_war_id' => '1',
         'name' => 'THE ENEMY',

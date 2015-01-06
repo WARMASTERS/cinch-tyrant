@@ -22,7 +22,7 @@ describe Cinch::Plugins::TyrantDeclare do
       @conn = FakeConnection.new
       @tyrant = Tyrants.get_fake('testplayer', @conn)
       expect(Tyrants).to receive(:get).with('testplayer').and_return(@tyrant)
-      message.user.stub(:master?).and_return(true)
+      allow(message.user).to receive(:master?).and_return(true)
     end
 
     it 'refuses if there is nobody with this name' do
@@ -86,7 +86,7 @@ describe Cinch::Plugins::TyrantDeclare do
 
       it 'declares with confirmation' do
         m = make_message(bot, '!declare --yes-really aa', channel: '#test')
-        m.user.stub(:master?).and_return(true)
+        allow(m.user).to receive(:master?).and_return(true)
         @conn.respond(
           'declareFactionWar', 'target_faction_id=2001&infamy_gain=0',
           {'result' => true, 'war_info' => make_war(1)}

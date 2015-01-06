@@ -28,7 +28,7 @@ describe Cinch::Plugins::TyrantStats do
     let(:message) { make_message(bot, '!stats', channel: '#test') }
 
     it 'shows stats link to user' do
-      message.user.stub(:signed_on_at).and_return(0)
+      allow(message.user).to receive(:signed_on_at).and_return(0)
       expect(IO).to receive(:read).with('/tmp/tyrant/stats_passwords/somefaction.txt').and_return('seekrit')
       password = Digest::SHA1.hexdigest('test$seekrit')
       replies = get_replies_text(message)
@@ -38,7 +38,7 @@ describe Cinch::Plugins::TyrantStats do
     end
 
     it 'denies just-logged-in user' do
-      message.user.stub(:signed_on_at).and_return(Time.now.to_i)
+      allow(message.user).to receive(:signed_on_at).and_return(Time.now.to_i)
       replies = get_replies_text(message)
       expect(replies).to be == [
         'test: STAY A WHILE AND LISTEN! It is very rude to ask for !stats right after signing on.',

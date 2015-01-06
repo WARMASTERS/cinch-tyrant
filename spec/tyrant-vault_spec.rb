@@ -27,7 +27,7 @@ describe Cinch::Plugins::TyrantVault do
   end
 
   def set_up_cards
-    plugin.stub(:shared).and_return({:cards_by_id => {
+    allow(plugin).to receive(:shared).and_return({:cards_by_id => {
       1 => FakeCard.new(1, 'My first card'),
       2 => FakeCard.new(2, 'Another awesome card'),
     }})

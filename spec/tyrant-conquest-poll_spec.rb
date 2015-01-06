@@ -35,7 +35,7 @@ describe Cinch::Plugins::TyrantConquestPoll do
       my_channel => FakeChannel.new,
     }
 
-    bot.plugins[0].stub(:Channel) { |n| @chans[n] }
+    allow(bot.plugins[0]).to receive(:Channel) { |n| @chans[n] }
   end
 
   it 'makes a test bot' do
@@ -225,7 +225,7 @@ describe Cinch::Plugins::TyrantConquestPoll do
       @chans.each_value { |c| c.messages.clear }
       bot.plugins[0].get_timers[1].fire!
 
-      Cinch::Plugins::TyrantConquestPoll.stub(:cards).and_return({
+      allow(Cinch::Plugins::TyrantConquestPoll).to receive(:cards).and_return({
         1000 => FakeCard.new(1000, 'Cyrus'),
         1001 => FakeCard.new(1001, 'Whisper'),
       })

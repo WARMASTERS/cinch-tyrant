@@ -18,13 +18,13 @@ describe Cinch::Plugins::TyrantSay do
   before :each do
     @conn = FakeConnection.new
     @tyrant = Tyrants.get_fake('testplayer', @conn)
-    bot.plugins[0].stub(:is_superofficer?).and_return(true)
+    allow(bot.plugins[0]).to receive(:is_superofficer?).and_return(true)
   end
 
   describe 'say' do
     before :each do
       expect(Tyrants).to receive(:get).with('testplayer').and_return(@tyrant)
-      message.user.stub(:master?).and_return(false)
+      allow(message.user).to receive(:master?).and_return(false)
     end
 
     let(:message) { make_message(bot, '!say something', channel: '#test') }
@@ -59,7 +59,7 @@ describe Cinch::Plugins::TyrantSay do
   describe 'flood control' do
     def msg
       m = make_message(bot, '!say asdf', channel: '#test')
-      m.user.stub(:master?).and_return(false)
+      allow(m.user).to receive(:master?).and_return(false)
       m
     end
 

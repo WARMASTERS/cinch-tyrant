@@ -18,7 +18,7 @@ describe Cinch::Plugins::TyrantMission do
   let(:xml_file) { 'blahblah.xml' }
 
   it 'makes a test bot' do
-    Cinch::Plugins::TyrantMission.stub(:parse_missions).and_return([])
+    allow(Cinch::Plugins::TyrantMission).to receive(:parse_missions).and_return([])
     expect(bot).to be_a Cinch::Bot
   end
 
@@ -57,8 +57,8 @@ describe Cinch::Plugins::TyrantMission do
         m.new('Mission 3', 1003, {999 => 2, 3 => 1}),
       ]
       missions.each { |m| m.cards.default = 0 }
-      Cinch::Plugins::TyrantMission.stub(:parse_missions).and_return(missions)
-      bot.plugins[0].stub(:shared).and_return({
+      allow(Cinch::Plugins::TyrantMission).to receive(:parse_missions).and_return(missions)
+      allow(bot.plugins[0]).to receive(:shared).and_return({
         :cards_by_id => {
           1 => card1,
           999 => FakeCard.new(999, 'wat'),

@@ -106,7 +106,7 @@ describe Cinch::Plugins::TyrantFaction do
 
       context 'with a master' do
         before :each do
-          message.user.stub(:master?).and_return(true)
+          allow(message.user).to receive(:master?).and_return(true)
           allow(message.user).to receive(:signed_on_at).and_return(0)
         end
 
@@ -120,7 +120,7 @@ describe Cinch::Plugins::TyrantFaction do
 
       context 'with a normal user' do
         before :each do
-          message.user.stub(:master?).and_return(false)
+          allow(message.user).to receive(:master?).and_return(false)
           allow(message.user).to receive(:signed_on_at).and_return(0)
         end
 
@@ -150,7 +150,7 @@ describe Cinch::Plugins::TyrantFaction do
 
       context 'with a master' do
         before :each do
-          message.user.stub(:master?).and_return(true)
+          allow(message.user).to receive(:master?).and_return(true)
           allow(message.user).to receive(:signed_on_at).and_return(0)
         end
 
@@ -164,7 +164,7 @@ describe Cinch::Plugins::TyrantFaction do
 
       context 'with a normal user' do
         before :each do
-          message.user.stub(:master?).and_return(false)
+          allow(message.user).to receive(:master?).and_return(false)
           allow(message.user).to receive(:signed_on_at).and_return(0)
         end
 
