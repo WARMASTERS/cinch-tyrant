@@ -104,6 +104,11 @@ BOT_PLUGIN_OPTIONS = {
     :checker => 'mychecker',
     # Name of a file storing the Faction name => ID mapping.
     :yaml_file => Settings::FACTIONS_YAML,
+    # Hash[channel_name => seconds] indicating how long a user must be logged in
+    # to be allowed to use.
+    :wait_time => {
+      '#mychannel' => 3600,
+    }
   },
   Cinch::Plugins::TyrantFactionChat => {
     # Hash[channel_name => [bool, int]] indicating whether to poll for that
@@ -135,6 +140,11 @@ BOT_PLUGIN_OPTIONS = {
   Cinch::Plugins::TyrantPlayer => {
     # Name of player (in Settings::PLAYERS) who will look up player data.
     :checker => 'mychecker',
+    # Hash[channel_name => seconds] indicating how long a user must be logged in
+    # to be allowed to use.
+    :wait_time => {
+      '#mychannel' => 3600,
+    }
   },
   Cinch::Plugins::TyrantRaids => {
     # Name of player (in Settings::PLAYERS) who will look up raid data.
@@ -159,12 +169,22 @@ BOT_PLUGIN_OPTIONS = {
     # The password file is expected to be in this directory, named
     # (faction abbreviation).txt
     :password_dir => Settings::TYRANT_DIR + '/stats_passwords',
+    # Hash[channel_name => seconds] indicating how long a user must be logged in
+    # to be allowed to use.
+    :wait_time => {
+      '#mychannel' => 3600,
+    }
   },
   Cinch::Plugins::TyrantTargets => {
     # Hash[faction ID => [low, high]] indicating the target range to look for.
     :channels => {
       1000002 => [500, 500],
     },
+    # Hash[channel_name => seconds] indicating how long a user must be logged in
+    # to be allowed to use.
+    :wait_time => {
+      '#mychannel' => 3600,
+    }
   },
   Cinch::Plugins::TyrantTile => {
     # Name of player (in Settings::PLAYERS) who will look up tile data.

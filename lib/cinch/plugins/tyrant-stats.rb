@@ -7,8 +7,6 @@ require 'tyrant/time'
 module Cinch; module Plugins; class TyrantStats
   include Cinch::Plugin
 
-  WAIT_TIME = 10 * ::Tyrant::Time::MINUTE
-
   match(/stats(?:\s+(\S+))?/i, method: :stats)
 
   HALP = 'Gives the link to the stats page with player and war data. ' +
@@ -37,7 +35,10 @@ module Cinch; module Plugins; class TyrantStats
 
     base = config[:base_url]
 
-    if m.user.signed_on_at.to_i + WAIT_TIME > Time.now.to_i
+    wait_times = config[:wait_time] || {}
+    wait_time = wait_times[m.channel.name.downcase] || 900
+
+    if m.user.signed_on_at.to_i + wait_time > Time.now.to_i
       m.reply('STAY A WHILE AND LISTEN! ' +
               'It is very rude to ask for !stats right after signing on.', true)
       m.user.notice("#{base}faction=#{targ}&username=stayawhile&password=andlisten")
